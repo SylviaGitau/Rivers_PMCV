@@ -465,7 +465,7 @@ A few weeks after the round one MDA, monitors conducted coverage validation to d
 
 ```{r training-results, echo=FALSE}
 
-sql_query_lga <- "SELECT attributes, variable, Round
+sql_query_lga <- "SELECT attibutes, variable, Round
 FROM lga_obs
 WHERE Round = 'Overall'
 AND year = 2022
@@ -484,7 +484,7 @@ data_tt <- dbGetQuery(con, sql_query_tt)
 
 # Calculate the percentage and display the text
 
-value_percent_lga <- data_lga$attributes[data_lga$variable == 'Sample size']
+value_percent_lga <- data_lga$attibutes[data_lga$variable == 'Sample size']
 value_percent_tt <- data_tt$attributes[data_tt$variable == 'Sample size']
 
 renderText(sprintf(
@@ -523,6 +523,27 @@ ggplot(data, aes(x = variable, y = value, fill = variable)) +
 
 
 ![](https://i.postimg.cc/qRmfmfzd/figure-2.jpg)
+
+```{r average, echo=FALSE}
+sql_query <- "SELECT variable, value, Round, attributes
+FROM tt_obs
+WHERE Round = 'Overall'
+AND year = 2022
+AND state = 'Rivers'
+AND variable = 'School attendance Rate'"
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+
+# Assuming 'value' is the column containing the numeric value
+value_percent <- as.numeric(data$value[data$variable == 'School attendance Rate']) * 100
+
+renderText(sprintf(
+  "On average, %.0f%% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58%% of teachers on-time - Figure 2.  During TT post-training interviews, 91%% of attendees reported attending the entire training. An attendance register was noted across 93%% of LGA trainings and all (100%%) TTs were monitored - Figure 3.",
+  value_percent
+))
+```
 
 On average, 64% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58% of teachers on-time - Figure 2.  During TT post-training interviews, 91% of attendees reported attending the entire training. An attendance register was noted across 93% of LGA trainings and all (100%) TTs were monitored - Figure 3.
 
