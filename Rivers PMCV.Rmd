@@ -500,25 +500,45 @@ renderText(sprintf(
 ```{r bar plot}
 
 library(ggplot2)
+library(gridExtra)
 
-# SQL query with a WHERE clause for the state of Rivers
-sql_query <- "SELECT variable, value
+# SQL query with a WHERE clause for the state of Rivers (LGA data)
+sql_query_lga <- "SELECT variable, value
  FROM lga_obs 
  WHERE state = 'Rivers'
  AND round = 'Overall'
  AND year = 2022
  AND (variable = 'Attendance rate at the start' OR variable = 'Day 1 overall attendance rate' OR  variable = 'Day 2 overall attendance rate')"
-data <- dbGetQuery(con, sql_query)
+data_lga <- dbGetQuery(con, sql_query_lga)
 
-#plotting
-ggplot(data, aes(x = variable, y = value, fill = variable)) +
+# SQL query with a WHERE clause for the state of Rivers (TT data)
+sql_query_tt <- "SELECT variable, value
+ FROM tt_obs 
+ WHERE year = 2022
+ AND round = 'Overall'
+ AND variable IN ('timely_attendance', 'School attendance Rate', 'Teachers attendance rate')"
+data_tt <- dbGetQuery(con, sql_query_tt)
+
+# Plotting for LGA data
+plot_lga <- ggplot(data_lga, aes(x = variable, y = value, fill = variable)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
-    labs(title = "LGA Training Attendance", x = NULL, y = NULL) +
-     coord_flip() +
-     theme_minimal()
- 
+    geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
+    labs(title = "LGA training attendance:", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
 
+# Plotting for TT data
+plot_tt <- ggplot(data_tt, aes(x = variable, y = value, fill = variable)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
+    labs(title = "Teacher training attendance:", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Arrange plots vertically
+grid.arrange(plot_lga, plot_tt, ncol = 1)
 ```
 
 
@@ -545,7 +565,6 @@ renderText(sprintf(
 ))
 ```
 
-On average, 64% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58% of teachers on-time - Figure 2.  During TT post-training interviews, 91% of attendees reported attending the entire training. An attendance register was noted across 93% of LGA trainings and all (100%) TTs were monitored - Figure 3.
 
 #### <span style="color:#fe6e87;">Topic coverage</span>
 
