@@ -144,7 +144,7 @@ When comparing surveyed coverage to government-reported coverage, reported cover
 
 ```{r process monitoring, echo = FALSE}
 
-sql_query <- "SELECT variable, value, Round, attributes
+sql_query <- "SELECT variable, value, Round, attibutes
 FROM tt_obs
 WHERE Round = 'Overall'
 AND year = 2022
@@ -157,7 +157,7 @@ data <- dbGetQuery(con, sql_query)
 
 value_percent <- data$value[data$variable == 'School attendance Rate'] * 100
 
-value_percent2 <- data$value[data$variable == 'Overall coverage of information on community sensitization' & data$attributes == 'Covered Partially'] * 100
+value_percent2 <- data$value[data$variable == 'Overall coverage of information on community sensitization' & data$attibutes == 'Covered Partially'] * 100
 
 renderText(sprintf(
   "● The program saw an increase in training attendance as compared to the previous year. %.0f%% of expected school representatives attended teacher training, a 12-percentage point increase from the previous year. All seven training topics were covered in at least %.0f%% of the monitored training sessions, with health education, drug administration, target population, and reporting and recording forms covered in 100%% of training sessions. Read more on training starting on page 8.",
@@ -472,7 +472,7 @@ AND year = 2022
 AND state = 'Rivers'
 AND variable = 'Sample size'"
 
-sql_query_tt <- "SELECT attributes, variable, Round
+sql_query_tt <- "SELECT attibutes, variable, Round
 FROM tt_obs
 WHERE Round = 'Overall'
 AND year = 2022
@@ -485,7 +485,7 @@ data_tt <- dbGetQuery(con, sql_query_tt)
 # Calculate the percentage and display the text
 
 value_percent_lga <- data_lga$attibutes[data_lga$variable == 'Sample size']
-value_percent_tt <- data_tt$attributes[data_tt$variable == 'Sample size']
+value_percent_tt <- data_tt$attibutes[data_tt$variable == 'Sample size']
 
 renderText(sprintf(
   "Monitors observed a sample of %s LGA level trainings and %s teacher trainings (TT) to measure the delivery and effectiveness of training sessions. Before the start of the training sessions, the monitors held interviews with the trainers to gauge their preparedness and deworming knowledge. To share information and keep participants engaged, trainers are encouraged to use a combination of teaching methods, as described in - Figure 2.",
@@ -545,7 +545,7 @@ grid.arrange(plot_lga, plot_tt, ncol = 1)
 ![](https://i.postimg.cc/qRmfmfzd/figure-2.jpg)
 
 ```{r average, echo=FALSE}
-sql_query <- "SELECT variable, value, Round, attributes
+sql_query <- "SELECT variable, value, Round, attibutes
 FROM tt_obs
 WHERE Round = 'Overall'
 AND year = 2022
@@ -568,13 +568,49 @@ renderText(sprintf(
 
 #### <span style="color:#fe6e87;">Topic coverage</span>
 
-Seven topics were meant to be covered across the training sessions. The topic of community sensitization was covered in 94% of the training sessions, while at least 98% of the training sessions 
+Seven topics were meant to be covered across the training sessions. The topic of community sensitization was covered in 94% of the training sessions, while at least 98% of the training sessions covered the other six topics. The topics of recording and reporting forms, health education, target population, and deworming medicine administration were covered in all (100%) training - **Figure 4.** 
 
-/* figure */
 
 ##### **Figure 4: Topic coverage (n=47)**
 
-/* figure */ 
+```{r figure4, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+
+# SQL query to sum the values for 'Covered Completely' and 'Covered Partially'
+sql_query_sum <- "
+SELECT variable, 
+       SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) as covered_completely,
+       SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) as covered_partially
+FROM tt_obs
+WHERE year = 2022
+AND round = 'Overall'
+AND variable IN ('Overall coverage of recording and reporting forms', 'STH coverage of information on health education- worms', 'Coverage of STH drug distribution', 'Overall coverage of roles and responsibilities', 'Coverage of information on side effects', 'Overall coverage of information on community sensitization')
+GROUP BY variable;
+"
+
+data_sum <- dbGetQuery(con, sql_query_sum)
+
+# Calculate the total for each variable
+data_sum$total <- rowSums(data_sum[, c("covered_completely", "covered_partially")])
+
+# Plotting the horizontal stacked bar chart with percentages
+ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable, fill = variable)) +
+  geom_bar(stat = "identity", position = "stack", color = "white", width = 0.7) +
+  geom_text(aes(label = sprintf("%.0f%%", total * 100)),
+            position = position_stack(vjust = 0.5),
+            color = "black", size = 2.5) +  # Adjusted font size
+  labs(title = NULL,
+       x = NULL,
+       y = NULL) +
+  scale_fill_manual(values = c("#FE6E87", "#FE6E87", "#FE6E87", "#FE6E87", "#FE6E87")) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(hjust = 0),
+        plot.title = element_text(size = 14),
+        legend.position = "none")  # Remove the legend
+```
+
+
  
 #### <span style="color:#fe6e87;">Topic 1: Health Education</span>
 
