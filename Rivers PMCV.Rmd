@@ -1,0 +1,792 @@
+---
+title: <span style="color:#fe6e87;">Deworm the World Initiative-<br> Rivers State, Nigeria</span>
+output: html_document
+runtime: shiny
+---
+
+
+
+*A Process Monitoring and Coverage Validation report from year 6 of School-<br>Based Deworming implementation in Rivers State, Nigeria*
+
+<span style="background-color:#fe6e87; color:white; display: inline-block; text-align: center; width: 100%;">*May and November, 2022*</span>
+
+
+**Prepared by:** 	Evidence Action
+
+**For:**                    	GiveWell and partners, Nigerian Ministries of Health and Education
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+
+```{r importing packages}
+library(shiny)
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(kableExtra)
+library(RPostgreSQL)
+library(DBI)
+```
+
+
+```{r database_connection, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+# import packages
+library(RPostgreSQL)
+library(shiny)
+library(shinyjs)
+
+# Database connection details
+db_user <- "sylviagitau"
+db_password <- "5y1Vi4.8|7@u"
+db_host <- "pilot.cnltbg2tkrfl.eu-central-1.rds.amazonaws.com"
+db_port <- 5432
+db_name <- "nigeria_pmcv"
+
+# Establish a database connection
+con <- dbConnect(
+  PostgreSQL(),
+  user = db_user,
+  password = db_password,
+  host = db_host,
+  port = db_port,
+  dbname = db_name
+)
+
+# Close the database connection
+# dbDisconnect(con)
+```
+
+
+### <span style="color:#fe6e87;">Table of Contents</span>
+
+```{r toc}
+contents <- c(
+  "Glossary" = 3,
+  "1.0 Executive Summary" = 4,
+  "2.0 Background" = 6,
+  "3.0 Methodology" = 7,
+  "3.1 Process Monitoring" = 7,
+  "3.2 Coverage Validation" = 7,
+  "4.0 Process Monitoring Results" = 8,
+  "4.1 Training Results" = 8,
+  "Topic coverage" = 10,
+  "Topic 1: Health Education" = 10,
+  "Topic 2: Target Population" = 11,
+  "Topic 3: Roles and Responsibilities" = 11,
+  "Topic 4: Community Sensitization" = 12,
+  "Topic 5: Recording and Reporting Forms" = 13,
+  "Topic 6: Drug Administration" = 14,
+  "Topic 7: Side Effects" = 15,
+  "Training Logistics" = 17,
+  "4.2 Distribution of Drugs and Materials" = 17,
+  "4.3 Community Sensitization" = 18,
+  "4.4 Deworming Week" = 23,
+  "5.0 Coverage Validation Results" = 25,
+  "5.1 STH Results" = 25,
+  "5.2 Reasons Drugs Were Not Provided and Non-compliance" = 26,
+  "5.3 Unprogrammed Deworming" = 27,
+  "6.0 Priorities and Way Forward" = 28
+)
+
+# Create a data frame from the vector
+toc_df <- data.frame(Content = names(contents), Page = unname(contents))
+
+
+# Print the table of contents
+kable(toc_df, "html") %>%
+  kable_styling()
+
+```
+
+### <span style="color:#fe6e87;">Glossary</span>
+
+```{r glossary}
+library(kableExtra)
+
+# Define your glossary or abbreviations
+glossary <- data.frame(
+  Abbreviation = c("**FLHF**  ", "**IEC**  ", "**LGA**  ", "**MDA**  ", "**PPE**  ", "**PPES**  ", "**SAE**  ", "**SBDP**  ", "**STH**  ", "**WHO**  "),
+  Definition = c("Frontline Health Facility", "Information, Education and Communication",
+                 "Local Government Area", "Mass Drug Administration",
+                 "Personal Protective Equipment", "Probability Proportionate to Estimated Size",
+                 "Severe Adverse Events", "School-Based Deworming Program",
+                 "Soil-Transmitted Helminths", "World Health Organization")
+)
+
+# Print the glossary table with space between rows
+kable(glossary, col.names = NULL) %>%
+  kable_styling() %>%
+  row_spec(1:nrow(glossary), extra_css = "margin-bottom: 10px;")
+```
+
+
+## <span style="color:#fe6e87;">1.0 Executive Summary</span>
+
+
+This report summarizes the results of two rounds of process monitoring during the May and November 2022 deworming rounds and one coverage validation (PMCV)  exercise following the first round of deworming in Rivers State, Nigeria. As a technical assistance partner to the Government of Rivers State, Evidence Action supports PMCV to determine what worked well and identify existing challenges within the implementation process and assess the accuracy of the reported government treatment data in select local government authorities (LGAs).
+ In 2022, Rivers carried out its sixth year of school-based deworming targeting both enrolled  and non-enrolled school-age children (SAC), 5-14 years. 
+In total, 1.88 million  SAC were targeted for deworming treatments across 21 endemic LGAs for soil-transmitted helminths (STH) and 1.64 million SAC were treated (87% government reported treatment coverage). 
+
+#### **Coverage Validation Findings**
+
+Coverage validation (CV) surveys were conducted within 6 weeks of round one MDA treatment within two randomly selected LGAs – Emohua and Opobo/Nkoro to evaluate the program reach and surveyed coverage. The findings indicate that 84% of SAC in Emohua and 92% in Opobo/Nkoro were offered the chance to swallow the drug (program reach), with 83% of SAC in Emohua and 91% in Opobo/Nkoro ingesting the drug (surveyed coverage).
+While CV was only conducted in two LGAs, and therefore not representative of the entire state, surveyed coverage for the two LGAs was above the WHO’s recommended 75% therapeutic coverage threshold for STH, indicating that these geographic units are on track to achieving disease control. 
+When comparing surveyed coverage to government-reported coverage, reported coverage for Emohua LGA was within the 95% confidence interval of the surveyed coverage. This suggests that the reporting system is working well. The reported coverage for Opobo/Nkoro LGA was outside the 95% confidence interval of the surveyed coverage. This suggests that the reporting system in this LGA is not working well. Read more on coverage validation on page 25
+
+#### **Process Monitoring Findings**
+
+```{r process monitoring, echo = FALSE}
+
+sql_query <- "SELECT variable, value, Round, attributes
+FROM tt_obs
+WHERE Round = 'Overall'
+AND year = 2022
+AND state = 'Rivers'
+AND variable IN ('School attendance Rate', 'Overall coverage of information on community sensitization')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+
+value_percent <- data$value[data$variable == 'School attendance Rate'] * 100
+
+value_percent2 <- data$value[data$variable == 'Overall coverage of information on community sensitization' & data$attributes == 'Covered Partially'] * 100
+
+renderText(sprintf(
+  "● The program saw an increase in training attendance as compared to the previous year. %.0f%% of expected school representatives attended teacher training, a 12-percentage point increase from the previous year. All seven training topics were covered in at least %.0f%% of the monitored training sessions, with health education, drug administration, target population, and reporting and recording forms covered in 100%% of training sessions. Read more on training starting on page 8.",
+  value_percent,
+  value_percent2
+))
+```
+
+
+
+●	Following teacher training, 79% of the monitored training sessions distributed all key materials (85% distributed drugs and 91% distributed reporting forms) to teachers to take to their respective schools for deworming day. Direct observation at schools during the deworming week and follow-up interviews with the head teachers after the process of drug administration at the schools revealed that 97% of schools had sufficient drugs to deworm all children present. Read more on drug and material distribution on page 17. 
+
+●	Seventy-three percent (73%) of parents were aware of deworming day, with this proportion higher among parents of enrolled children (86%) as compared to the parents of non-enrolled children (43%). Seventy-six percent (76%) of parents, a 2-percentage point decrease from the previous year , who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (55%) and lack of school enrollment (13%). The primary sources of deworming day information cited by parents were children (74%), followed by teachers (40%). Read more about community sensitization on page 18.
+
+●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at 100% of schools, and 92% of schools utilized the treatment register. Eighty-five percent (85%) of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23. 
+
+Table 1 below provides the round-wise breakdown of Process Monitoring and Coverage Validation results against key indicators.
+
+##### **Table 1: Key Performance Indicators**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.custom-table td,
+.custom-table th {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+
+.custom-table .bold-row th {
+  font-weight: bold;
+}
+
+.custom-table .border-left th,
+.custom-table .border-left td {
+  border-left: 1px solid #000;
+}
+
+.custom-table .border-right th,
+.custom-table .border-right td {
+  border-right: 1px solid #000;
+}
+
+/* Define custom background color for specific rows */
+.custom-table .process-monitoring,
+.custom-table .coverage-validation {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Your Table -->
+<div class="custom-table">
+  <table>
+    <tr class="process-monitoring">
+      <td>Process Monitoring</td>
+      <td>Year 6, Round 1</td>
+      <td>Year 6, Round 2</td>
+      <td>Overall</td>
+    </tr>
+    <tr>
+      <td>Target schools represented at teacher training</td>
+      <td>63%</td>
+      <td>66%</td>
+      <td>64%</td>
+    </tr>
+    <tr>
+      <td>Target schools with adequate drugs during deworming</td>
+      <td>97%</td>
+      <td>97%</td>
+      <td>97%</td>
+    </tr>
+    <tr>
+      <td>Target school utilizing at least one awareness activity or material</td>
+      <td>53%</td>
+      <td>83%</td>
+      <td>68%</td>
+    </tr>
+    <tr>
+      <td>Community members who report seeing or hearing about deworming through IEC deworming materials or word of mouth this year</td>
+      <td>70%</td>
+      <td>77%</td>
+      <td>73%</td>
+    </tr>
+    <tr>
+      <td>Target schools distributing tablets on deworming day</td>
+      <td>100%</td>
+      <td>87%</td>
+      <td>87%</td>
+    </tr>
+    <tr>
+      <td>Enrolled children present in school on deworming day</td>
+      <td>80%</td>
+      <td>80%</td>
+      <td>80%</td>
+    </tr>
+    <tr>
+      <tr class="coverage-validation">
+      <td>Coverage Validation</td>
+      <td>Year 6, Round 1</td>
+      <td>Year 6, Round 2</td>
+      <td>Overall</td>
+    </tr>
+    <tr>
+      <td>Targeted children who report receiving unprogrammed deworming in the last six months</td>
+      <td>21%</td>
+      <td>N/A<sup>4</sup></td>
+      <td>21%</td>
+    </tr>
+    <tr>
+      <td>Target population validated as swallowing deworming tablets on deworming day based on Coverage Validation</td>
+      <td>86%</td>
+      <td>N/A</td>
+      <td>86%</td>
+    </tr>
+  </table>
+</div>
+
+
+##### **Table 2: Coverage Validation Survey Results**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.custom-table td,
+.custom-table th {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+
+.custom-table .bold-row th {
+  font-weight: bold;
+}
+
+.custom-table .border-left th,
+.custom-table .border-left td {
+  border-left: 1px solid #000;
+}
+
+.custom-table .border-right th,
+.custom-table .border-right td {
+  border-right: 1px solid #000;
+}
+</style>
+
+<!-- Your Table -->
+<div class="custom-table">
+  <table>
+    <tr>
+      <th colspan="1">LGA</th>
+      <th colspan="3">Program Reach</th>
+      <th colspan="3">Surveyed Coverage</th>
+      <th colspan="1">Reported Coverage</th>
+      <th colspan="1">Denominator</th>
+    </tr>
+    <tr class="bold-row">
+      <td></td>
+      <td>Mean (%)</td>
+      <td>% Lower bound CI</td>
+      <td>% Upper bound CI</td>
+      <td>Mean (%)</td>
+      <td>% Lower bound CI</td>
+      <td>% Upper bound CI</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Emohua</td>
+      <td>84%</td>
+      <td>82%</td>
+      <td>86%</td>
+      <td>83%</td>
+      <td>78%</td>
+      <td>87%</td>
+      <td>86%</td>
+      <td>1,671</td>
+    </tr>
+    <tr>
+      <td>Opobo / Nkoro</td>
+      <td>92%</td>
+      <td>90%</td>
+      <td>94%</td>
+      <td>91%</td>
+      <td>88%</td>
+      <td>94%</td>
+      <td>86%</td>
+      <td>701</td>
+    </tr>
+  </table>
+</div>
+
+
+Overall, Y6 implementation was successful, with several KPIs improving since the previous round. Improvements in school attendance resulted in a 20 percentage point increase from 56% in year 5. On deworming week, material distribution was also commendable, with all (100%) and 75% of schools having deworming medicine and monitoring forms,  respectively. Community awareness of deworming through IEC deworming materials or word of mouth was at 73% among parents. During deworming week, the number of schools distributing mebendazole tablets increased; 87% of expected schools distributed tablets, a 27 percentage point increase from the previous year. Further details on priorities for program improvement and ways forward can be found on page 28.
+
+## <span style="color:#fe6e87;">2.0 Background</span>
+
+In total, 1.88 million  SAC were targeted for deworming treatments across 21 endemic LGAs for soil-transmitted helminths (STH) and 1.64 million SAC were treated (87% government reported treatment coverage).
+
+Approximately 9760 teachers were trained to properly administer deworming drugs.
+
+Evidence Action recruited an independent firm, Infotrak Research, and Consulting, to monitor random samples of program activities to assess the quality of implementation, adherence to protocol, and supply chain effectiveness. During the year, monitors observed 14 LGA trainings, 47 teacher trainings, and 60 schools on deworming day, and interviewed 168 parents in the community. Evidence Action designed data collection tools and sampling methods, and cleaned and analyzed the data from the above activities. The findings are presented in this report.
+
+
+## <span style="color:#fe6e87;">3.0 Methodology</span>
+
+### <span style="color:#fe6e87;">3.1 Process Monitoring</span>
+
+To assess the quality of teacher training and the implementation of deworming, Evidence Action randomly selected 48 of approximately 339 total teacher training sessions for observation and training assessment, and 60 of about 5,410 total schools for observation and interviews of teachers, children, and parents by independent monitors on deworming day. Seventy percent (73% in round one and 67% in round two) of schools observed were primary level, 17% (17% in each round) were junior secondary level, 10% (10% in each round) included both levels, and 3% (0% in round one and 7% in round two)were nursery and primary level. By school type, 58% (63% in round one and 53% in round two) were public and 42% (37% in round one and 47% in round two) were private. 
+
+Monitors observed sampled teacher training sessions and interviewed trainers. Before the start of these sessions, four participants were targeted for pre-training interviews and four participants for post-training interviews. The participants were systematically sampled so that every third participant to arrive at the venue was interviewed pre-training, and every third participant to receive training materials was selected for a post-interview.
+
+On deworming day, monitors interviewed head teachers and teachers from sampled schools regarding their plans for deworming, their treatment knowledge, and any sensitization activities they had carried out in schools and local communities. Monitors then observed the drug administration process to verify that the required deworming procedures were followed. After treatment, monitors randomly selected and interviewed two enrolled children and one  non-enrolled child. Parents residing in areas around the selected schools were interviewed on deworming day to gauge their level of awareness of the program. At each of the 60 visited communities, monitors targeted 3 parents (a total of 180 parents) for such interviews -- 2 parents of children enrolled in school and 1 parent of children not enrolled in school (in total, 119 parents of enrolled children and 49 parents of non-enrolled children were found for interview). A timeline for the cascade of activities is shown in - Figure 1 below.
+
+##### **Figure 1: Timeline of events cascade**
+
+![](https://i.postimg.cc/W16JhSdk/figure-1.jpg)
+
+### <span style="color:#fe6e87;">3.2 Coverage Validation</span>
+
+A few weeks after the round one MDA, monitors conducted coverage validation to determine the program reach and surveyed coverage, per WHO guidelines while surveying schools and communities. A total of 2,372 children were interviewed from the two LGAs using a two-stage probability proportional to estimated size (PPES) sampling design.
+
+##### **Table 3: Process monitoring and coverage validation targeted and actual sample sizes**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table td,
+.custom-table th {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+
+.gray-row th {
+  background-color: #C0C0C0;
+  border: none;
+}
+
+.green-row th {
+  background-color: #C0C0C0;
+  border: none;
+}
+
+.green-row td {
+  border-left: none;
+  border-right: none;
+}
+
+.green-row td:first-child {
+  border-left: 1px solid #000;
+}
+</style>
+
+<!-- Your Table -->
+<div class="custom-table">
+  | Monitoring activity                           | Target sample size | Actual sample size |
+  |-----------------------------------------------|--------------------|--------------------|
+  | LGA and teacher training                      |                    |                    |
+  | LGA training sessions                         | 14                 | 14                 |
+  | Pre-training LGA interviews                   | 56                 | 51                 |
+  | Post-training LGA interviews                  | 56                 | 56                 |
+  | Teacher training sessions                     | 48                 | 47                 |
+  | Pre-training teacher interviews               | 192                | 184                |
+  | Post-training teacher interviews              | 192                | 182                |
+  | Post-training LGA FLHF staff interviews       | 42                 | 25<sup>8</sup>                 |
+  | Deworming day interviews                      |                    |                    |
+  | Schools targeted for monitoring on deworming day | 60               | 60                 |
+  | Parents of non-enrolled children interviewed on deworming day | 60 | 49<sup>9</sup>         |
+  | Parents of enrolled children interviewed on deworming day | 120         | 119        |
+  | Enrolled children interviewed                 | 120                | 118                |
+  | Head teachers interviewed                     | 60                 | 60                 |
+  | Teachers interviewed                          | 60                 | 60                 |
+  | FLHF staff interviewed                        | 60                 | 28<sup>10</sup>   |
+  | Coverage validation                           |                    |                    |
+  | Number of children interviewed                | 2,357              | 2,372<sup>11</sup>|
+</div>
+
+## <span style="color:#fe6e87;">4.0 Process Monitoring Results</span>
+
+### <span style="color:#fe6e87;">4.1 Training Results</span>
+
+```{r training-results, echo=FALSE}
+
+sql_query_lga <- "SELECT attributes, variable, Round
+FROM lga_obs
+WHERE Round = 'Overall'
+AND year = 2022
+AND state = 'Rivers'
+AND variable = 'Sample size'"
+
+sql_query_tt <- "SELECT attributes, variable, Round
+FROM tt_obs
+WHERE Round = 'Overall'
+AND year = 2022
+AND state = 'Rivers'
+AND variable = 'Sample size'"
+
+data_lga <- dbGetQuery(con, sql_query_lga)
+data_tt <- dbGetQuery(con, sql_query_tt)
+
+# Calculate the percentage and display the text
+
+value_percent_lga <- data_lga$attributes[data_lga$variable == 'Sample size']
+value_percent_tt <- data_tt$attributes[data_tt$variable == 'Sample size']
+
+renderText(sprintf(
+  "Monitors observed a sample of %s LGA level trainings and %s teacher trainings (TT) to measure the delivery and effectiveness of training sessions. Before the start of the training sessions, the monitors held interviews with the trainers to gauge their preparedness and deworming knowledge. To share information and keep participants engaged, trainers are encouraged to use a combination of teaching methods, as described in - Figure 2.",
+  value_percent_lga,
+  value_percent_tt
+))
+```
+
+
+##### **Figure 2: Training attendance, methods, and venue**
+
+```{r bar plot}
+
+library(ggplot2)
+
+# SQL query with a WHERE clause for the state of Rivers
+sql_query <- "SELECT variable, value
+ FROM lga_obs 
+ WHERE state = 'Rivers'
+ AND round = 'Overall'
+ AND year = 2022
+ AND (variable = 'Attendance rate at the start' OR variable = 'Day 1 overall attendance rate' OR  variable = 'Day 2 overall attendance rate')"
+data <- dbGetQuery(con, sql_query)
+
+#plotting
+ggplot(data, aes(x = variable, y = value, fill = variable)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
+    labs(title = "LGA Training Attendance", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal()
+ 
+
+```
+
+
+![](https://i.postimg.cc/qRmfmfzd/figure-2.jpg)
+
+On average, 64% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58% of teachers on-time - Figure 2.  During TT post-training interviews, 91% of attendees reported attending the entire training. An attendance register was noted across 93% of LGA trainings and all (100%) TTs were monitored - Figure 3.
+
+#### <span style="color:#fe6e87;">Topic coverage</span>
+
+Seven topics were meant to be covered across the training sessions. The topic of community sensitization was covered in 94% of the training sessions, while at least 98% of the training sessions 
+
+/* figure */
+
+##### **Figure 4: Topic coverage (n=47)**
+
+/* figure */ 
+ 
+#### <span style="color:#fe6e87;">Topic 1: Health Education</span>
+
+##### **Figure 5: Health education messages covered in trainings and participants’ pre- and post-training knowledge**
+
+
+/* figure */
+
+The coverage of the four health education messages and participants’ post-training recollection, is shown in - Figure 5 above. Post-training interviews with participants revealed that 99% could name at least one way a person becomes infected with worms. Additionally, 70% of teachers shared health messages with children before deworming.
+
+#### <span style="color:#fe6e87;">Topic 2: Target Population</span>
+
+Proper identification of the target group is critical to meeting the program goal of treating all eligible at-risk persons. Figure 6 below shows training coverage of the target population and knowledge during deworming day. It also displays training coverage of non-eligible persons, as well as pre- and post-training knowledge scores.
+
+##### **Figure 6: Information on target population and pre-post knowledge of treatment eligibility criteria**
+ /* figure */
+ 
+ /* figure2 */ 
+
+#### <span style="color:#fe6e87;">Topic 3: Roles and Responsibilities</span>
+
+The success of the MDA hinges on the proper identification of the contributions of various actors and the roles they play throughout the MDA. The sessions on the roles and responsibilities of teachers were covered in 98% of the monitored teacher training sessions. LGA training sessions emphasized the role of head teachers in discussing deworming day at school management meetings, PTA meetings, etc. (100%) - **Figure 7.**
+
+##### **Figure 7: Roles and responsibilities covered by trainers in LGA and teacher trainings**
+
+/* figure 1 */
+
+/* figure 2 */
+
+**Figure 8**, below, shows frontline health facility (FLHF) staff knowledge of their roles and responsibilities on deworming day.
+
+##### **Figure 8: Self-reported roles during deworming day**
+
+#### <span style="color:#fe6e87;">Topic 4: Community Sensitization</span>
+
+Raising awareness of the MDA within the target geographic area and population is pivotal to the achievement of the target therapeutic coverage of at least 75% of the at-risk population. Ninety-three percent (93%) of LGA training and all (100%) teacher training sessions announced the date of deworming day/week during the training sessions, and all (100%) TT participants reported the correct date of deworming after training. Monitors noted that 94% of trainers covered how teachers and FLHF staff will conduct sensitization activities before the MDA during the sensitization and mobilization session of teacher training. Although 91% of trainers covered the responsibilities of teachers in community sensitization at the teacher training, fewer than 80% of the teachers could cite any of their specific responsibilities post-training - **Figure 9.**
+
+##### **Figure 9: Community sensitization topics covered by trainers and post-training knowledge**
+
+/* figure1 */
+
+/* figure2 */
+
+#### <span style="color:#fe6e87;">Topic 5: Recording and Reporting Forms</span>
+
+During MDAs, teachers are required to fill out treatment registers at the class level while head teachers fill out the school summary forms at the school level. Hence, they should be trained comprehensively on how to fill them in. Trainers are also required to inform teachers that all forms post-MDA are to be returned to the FLHF. A high proportion of trainers (100%) highlighted the need to record treatment on both forms - treatment registers and school summary forms, and a high proportion of participants recalled this information post-training (at least 86%) and on deworming day (at least 80%) - **Figure 10.**
+
+##### **Figure 10: Messages shared about reporting forms and participants’ post-training knowledge**
+
+/* figure1 */
+
+#### <span style="color:#fe6e87;">Topic 6: Drug Administration</span>
+
+The drug administration topic was covered in all (100%) LGA and teacher training sessions, and all sub-topics were covered in at least 77% of the teacher trainings monitored - **Table 4.**
+
+##### **Table 4: Messages on deworming medicine administration covered in trainings**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+  padding: 8px; /* Add padding specifically for the header cells */
+}
+
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>MDA Practice</th>
+      <th>LGA training <br> (n=14)</th>
+      <th>Teacher training <br> (n=47)</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>One mebendazole tablet to be given to each child</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>STH drug is mebendazole</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Register enrolled children before deworming day and non-enrolled children on deworming day, before treatment</td>
+      <td>100%</td>
+      <td>91%</td>
+    </tr>
+    <tr>
+      <td>Complete class level summary form as the child is treated</td>
+      <td>100%</td>
+      <td>98%</td>
+    </tr>
+    <tr>
+      <td>Facilitate hand washing before treatment</td>
+      <td>86%</td>
+      <td>79%</td>
+    </tr>
+    <tr>
+      <td>Observe the child’s mouth to see if each child chews and swallows the tablet</td>
+      <td>100%</td>
+      <td>77%</td>
+    </tr>
+    <tr>
+      <td>Under no circumstances should a child be forced to swallow the medicine</td>
+      <td>100%</td>
+      <td>90%</td>
+    </tr>
+    <tr>
+      <td>Under the program, all drugs are free, safe and effective</td>
+      <td>100%</td>
+      <td>91%</td>
+    </tr>
+    <tr>
+      <td>Drugs must be stored in a clean, safe, dry and cool location</td>
+      <td>93%</td>
+      <td>83%</td>
+    </tr>
+  </tbody>
+</table>
+
+
+On deworming day, every member of the deworming team (100%) knew the correct dosage, and that the drug used for treatment was mebendazole - **Figure 11.** 
+
+##### **Figure 11: Deworming team knowledge of drugs and dosage on deworming day (n=60)** 
+
+/* figure */
+
+#### <span style="color:#fe6e87;">Topic 7: Side Effects</span>
+
+Side effects are potential outcomes of any treatment that may or may not be directly related to the treatment being provided. To ensure that teachers were effectively equipped to handle such cases, trainers covered information on possible side effects and how to handle them in 98% (100% in round one and 94% in round two) of teacher training sessions and all (100% - in each round) in LGA trainings. Coverage of these side effects and teachers’ pre- and post-training knowledge is shown in - Figure 12. While post-training scores for all side effects increased from pre-training levels, the majority of participants recalled only two side effects post-training. Additional indicators relating to severe adverse effects (SAEs) can be found in - **Table 5**, including the teacher's and FLHF's knowledge of side effects and SAEs on deworming day.
+
+##### **Figure 12: Messages shared about side effects, participants’ pre- and post-training knowledge and FLHF on deworming day** 
+
+/* figure 1 */
+
+/* figure 2 */
+
+##### **Table 5: Coverage and retention of knowledge of side effects in LGA and teacher trainings and on deworming day**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Year 6, Round 2</th>
+      <th>Year 6, Round 1</th>
+      <th>Year 5, Round 1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="4" class="left-align"><strong>Topics covered during training</strong></td>
+    </tr>
+    <tr>
+      <td>Steps to be taken in cases of SAEs at LGA trainings</td>
+      <td>100%</td>
+      <td>88%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Steps to be taken in cases of SAEs at teacher trainings</td>
+      <td>94%</td>
+      <td>93%</td>
+      <td>86%</td>
+    </tr>
+    <tr>
+      <td>Side effects in LGA trainings</td>
+      <td>100%</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Side effects in teacher trainings</td>
+      <td>94%</td>
+      <td>100%</td>
+      <td>89%</td>
+    </tr>
+    <tr>
+      <td colspan="4" class="left-align"><strong>LGA and Teacher training</strong></td>
+    </tr>
+    <tr>
+      <td>LGA training attendees that could cite at least one side effect in post-training interviews</td>
+      <td>96%</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Teacher training attendees that could cite at least one side effect in post-training interviews</td>
+      <td>96%</td>
+      <td>97%</td>
+      <td>97%</td>
+    </tr>
+    <tr>
+      <td>Teachers that reported having FLHF staff contact information in post-training interviews</td>
+      <td>79%</td>
+      <td>59%</td>
+      <td>62%</td>
+    </tr>
+    <tr>
+      <td colspan="4" class="left-align"><strong>Deworming day</strong></td>
+    </tr>
+    <tr>
+      <td>FLHF staff could cite at least one side effect</td>
+      <td>100%</td>
+      <td>100%</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>FLHF staff mentioned the correct steps to take in case of SAE</td>
+      <td>29%</td>
+      <td>36%</td>
+      <td>40%</td>
+    </tr>
+  </tbody>
+</table>
+
+
+```{r}
+
+```
+
