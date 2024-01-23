@@ -251,6 +251,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
       ```{r school_attendance, results='asis'}
       query_school_attendance <- "SELECT Round, value FROM tt_obs
                                   WHERE year = 2022
+                                  AND state = 'Rivers'
                                   AND variable = 'School attendance Rate'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       school_attendance_data <- dbGetQuery(con, query_school_attendance)
@@ -264,6 +265,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
       ```{r adequate-drugs, results='asis'}
       query_adequate_drugs <- "SELECT Round, value FROM dd_main
                                   WHERE year = 2022
+                                  AND state = 'Rivers'
                                   AND variable = 'ASK:Were deworming medicines sufficient for today?'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       adequate_drugs_data <- dbGetQuery(con, query_adequate_drugs)
@@ -292,9 +294,17 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     </tr>
     <tr>
       <td>Enrolled children present in school on deworming day</td>
-      <td>80%</td>
-      <td>80%</td>
-      <td>80%</td>
+      ```{r enrolled-children, results='asis'}
+      query_enrolled_children <- "SELECT Round, value FROM dd_main
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND variable = 'Proportion of students who were present on DD'
+                                  AND Round IN ('Round 1', 'Round 2', 'Overall')"
+      enrolled_children_data <- dbGetQuery(con, query_enrolled_children)
+      for (i in 1:nrow(enrolled_children_data)) {
+        cat("<td>", scales::percent(enrolled_children_data$value[i]), "</td>")
+      }
+      ```
     </tr>
     <tr>
       <tr class="coverage-validation">
