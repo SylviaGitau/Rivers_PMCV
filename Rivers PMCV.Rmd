@@ -261,9 +261,16 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     </tr>
     <tr>
       <td>Target schools with adequate drugs during deworming</td>
-      <td>97%</td>
-      <td>97%</td>
-      <td>97%</td>
+      ```{r adequate-drugs, results='asis'}
+      query_adequate_drugs <- "SELECT Round, value FROM dd_main
+                                  WHERE year = 2022
+                                  AND variable = 'ASK:Were deworming medicines sufficient for today?'
+                                  AND Round IN ('Round 1', 'Round 2', 'Overall')"
+      adequate_drugs_data <- dbGetQuery(con, query_adequate_drugs)
+      for (i in 1:nrow(school_attendance_data)) {
+        cat("<td>", scales::percent(adequate_drugs_data$value[i]), "</td>")
+      }
+      ```
     </tr>
     <tr>
       <td>Target school utilizing at least one awareness activity or material</td>
