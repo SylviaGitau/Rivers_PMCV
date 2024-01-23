@@ -497,7 +497,7 @@ renderText(sprintf(
 
 ##### **Figure 2: Training attendance, methods, and venue**
 
-```{r bar plot}
+```{r bar plot, echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
@@ -511,6 +511,14 @@ sql_query_lga <- "SELECT variable, value
  AND (variable = 'Attendance rate at the start' OR variable = 'Day 1 overall attendance rate' OR  variable = 'Day 2 overall attendance rate')"
 data_lga <- dbGetQuery(con, sql_query_lga)
 
+# Mapping original variable names to desired names(lga)
+variable_mapping_lga <- c('Day 1 overall attendance rate' = 'Day 1 overall attendance rate(n=14)',
+                       'Day 2 overall attendance rate' = 'Day 2 overall attendance rate(n=8)',
+                       'Attendance rate at the start' = 'Day 1 timely attendance(n=14)')
+
+# Apply the mapping to the 'variable' column in data_lga
+data_lga$variable_mapped <- variable_mapping_lga[data_lga$variable]
+
 # SQL query with a WHERE clause for the state of Rivers (TT data)
 sql_query_tt <- "SELECT variable, value
  FROM tt_obs 
@@ -519,8 +527,16 @@ sql_query_tt <- "SELECT variable, value
  AND variable IN ('timely_attendance', 'School attendance Rate', 'Teachers attendance rate')"
 data_tt <- dbGetQuery(con, sql_query_tt)
 
+# Mapping original variable names to desired names(tt)
+variable_mapping_tt <- c('timely_attendance' = 'Timely attendance of teachers(n=47)',
+                       'School attendance Rate' = 'Overall school attendance(n=47)',
+                       'Teachers attendance rate' = 'Overall teacher attendance rate(n=47)')
+
+# Apply the mapping to the 'variable' column in data_tt
+data_tt$variable_mapped <- variable_mapping_tt[data_tt$variable]
+
 # Plotting for LGA data
-plot_lga <- ggplot(data_lga, aes(x = variable, y = value, fill = variable)) +
+plot_lga <- ggplot(data_lga, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
     labs(title = "LGA training attendance:", x = NULL, y = NULL) +
@@ -529,7 +545,7 @@ plot_lga <- ggplot(data_lga, aes(x = variable, y = value, fill = variable)) +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
 # Plotting for TT data
-plot_tt <- ggplot(data_tt, aes(x = variable, y = value, fill = variable)) +
+plot_tt <- ggplot(data_tt, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
     labs(title = "Teacher training attendance:", x = NULL, y = NULL) +
@@ -539,31 +555,12 @@ plot_tt <- ggplot(data_tt, aes(x = variable, y = value, fill = variable)) +
 
 # Arrange plots vertically
 grid.arrange(plot_lga, plot_tt, ncol = 1)
+
 ```
+
 
 
 ![](https://i.postimg.cc/qRmfmfzd/figure-2.jpg)
-
-```{r average, echo=FALSE}
-sql_query <- "SELECT variable, value, Round, attibutes
-FROM tt_obs
-WHERE Round = 'Overall'
-AND year = 2022
-AND state = 'Rivers'
-AND variable = 'School attendance Rate'"
-
-data <- dbGetQuery(con, sql_query)
-
-# Calculate the percentage and display the text
-
-# Assuming 'value' is the column containing the numeric value
-value_percent <- as.numeric(data$value[data$variable == 'School attendance Rate']) * 100
-
-renderText(sprintf(
-  "On average, %.0f%% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58%% of teachers on-time - Figure 2.  During TT post-training interviews, 91%% of attendees reported attending the entire training. An attendance register was noted across 93%% of LGA trainings and all (100%%) TTs were monitored - Figure 3.",
-  value_percent
-))
-```
 
 
 #### <span style="color:#fe6e87;">Topic coverage</span>
@@ -573,7 +570,8 @@ Seven topics were meant to be covered across the training sessions. The topic of
 
 ##### **Figure 4: Topic coverage (n=47)**
 
-```{r figure4, echo=FALSE, message=FALSE, warning=FALSE}
+
+```{r figure4, echo=FALSE}
 
 library(ggplot2)
 
@@ -591,11 +589,21 @@ GROUP BY variable;
 
 data_sum <- dbGetQuery(con, sql_query_sum)
 
+# Mapping original variable names to desired names
+variable_mapping <- c('Overall coverage of recording and reporting forms' = 'Recording and reporting forms',
+                       'STH coverage of information on health education- worms' = 'Health education',
+                       'Coverage of STH drug distribution' = 'Deworming medicine administration',
+                       'Coverage of information on side effects' = 'Side effects',
+                       'Overall coverage of information on community sensitization' = 'Community sensitization')
+
+# Creating a new variable with the desired names
+data_sum$variable_mapped <- variable_mapping[data_sum$variable]
+
 # Calculate the total for each variable
 data_sum$total <- rowSums(data_sum[, c("covered_completely", "covered_partially")])
 
 # Plotting the horizontal stacked bar chart with percentages
-ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable, fill = variable)) +
+ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable_mapped, fill = variable_mapped)) +
   geom_bar(stat = "identity", position = "stack", color = "white", width = 0.7) +
   geom_text(aes(label = sprintf("%.0f%%", total * 100)),
             position = position_stack(vjust = 0.5),
@@ -606,6 +614,7 @@ ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable, f
   scale_fill_manual(values = c("#FE6E87", "#FE6E87", "#FE6E87", "#FE6E87", "#FE6E87")) +
   theme_minimal() +
   theme(axis.text.y = element_text(hjust = 0),
+        axis.text.x = element_blank(),  # Remove x-axis text
         plot.title = element_text(size = 14),
         legend.position = "none")  # Remove the legend
 ```
