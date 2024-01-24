@@ -170,24 +170,32 @@ renderText(sprintf(
 
 ```{r part2, echo=FALSE}
 
-sql_query <- "SELECT variable, value, Round
+sql_query <- "SELECT variable, value, Round, attibutes
               FROM ttci_prepost
               WHERE Round = 'Overall'
               AND year = 2022
               AND state = 'Rivers'
-              AND variable = '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'"
+              AND (variable = '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'
+                   OR (variable = 'What materials did you receive during the training for conducting deworming?'
+                       AND attibutes = 'Treatment Data Forms'))"
 
 data <- dbGetQuery(con, sql_query)
 
 # Calculate the percentage and display the text
 value_percent <- data$value[data$variable == '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'] * 100
+value_percent2 <- data$value[data$variable == 'What materials did you receive during the training for conducting deworming?' & data$attibutes == 'Treatment Data Forms'] * 100
 
+# Check the number of rows returned
+n_rows <- nrow(data)
+
+# Use the dynamic values in the output text
 renderText(sprintf(
-  "● Following teacher training, %.0f%% of the monitored training sessions distributed all key materials (85%% distributed drugs and 91%% distributed reporting forms) to teachers to take to their respective schools for deworming day. Direct observation at schools during the deworming week and follow-up interviews with the head teachers after the process of drug administration at the schools revealed that 97%% of schools had sufficient drugs to deworm all children present. Read more on drug and material distribution on page 17.",
-  value_percent
+  "● Following teacher training, %.0f%% of the monitored training sessions distributed all key materials (85%% distributed drugs and %.0f%% distributed reporting forms) to teachers to take to their respective schools for deworming day. Direct observation at schools during the deworming week and follow-up interviews with the head teachers after the process of drug administration at the schools revealed that %.0f%% of schools had sufficient drugs to deworm all children present. Read more on drug and material distribution on page 17.",
+  value_percent,
+  value_percent2,
+  n_rows  # Add the number of rows as a placeholder argument
 ))
 ```
-
 
 
 ●	Seventy-three percent (73%) of parents were aware of deworming day, with this proportion higher among parents of enrolled children (86%) as compared to the parents of non-enrolled children (43%). Seventy-six percent (76%) of parents, a 2-percentage point decrease from the previous year , who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (55%) and lack of school enrollment (13%). The primary sources of deworming day information cited by parents were children (74%), followed by teachers (40%). Read more about community sensitization on page 18.
