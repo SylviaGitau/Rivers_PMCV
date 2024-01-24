@@ -168,7 +168,7 @@ renderText(sprintf(
 
 
 
-```{r part2, echo=FALSE}
+```{r part3, echo=FALSE}
 
 sql_query <- "SELECT variable, value, Round, attibutes
               FROM ttci_prepost
@@ -177,24 +177,27 @@ sql_query <- "SELECT variable, value, Round, attibutes
               AND state = 'Rivers'
               AND (variable = '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'
                    OR (variable = 'What materials did you receive during the training for conducting deworming?'
-                       AND attibutes = 'Treatment Data Forms'))"
+                       AND attibutes  IN ( 'Deworming medicine' , 'Treatment Data Forms')))"
 
 data <- dbGetQuery(con, sql_query)
 
 # Calculate the percentage and display the text
-value_percent <- data$value[data$variable == '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'] * 100
-value_percent2 <- data$value[data$variable == 'What materials did you receive during the training for conducting deworming?' & data$attibutes == 'Treatment Data Forms'] * 100
 
-# Check the number of rows returned
+value_percent <- data$value[data$variable == '% teachers who received all key materials for for DD (Treatment forms and Mebendazole tablets)'] * 100
+value_percent2 <- data$value[data$variable == 'What materials did you receive during the training for conducting deworming?' & data$attibutes == 'Deworming medicine'] * 100
+value_percent3 <- data$value[data$variable == 'What materials did you receive during the training for conducting deworming?' & data$attibutes == 'Treatment Data Forms'] * 100
+# Calculate the number of rows
 n_rows <- nrow(data)
 
+
 # Use the dynamic values in the output text
-renderText(sprintf(
-  "● Following teacher training, %.0f%% of the monitored training sessions distributed all key materials (85%% distributed drugs and %.0f%% distributed reporting forms) to teachers to take to their respective schools for deworming day. Direct observation at schools during the deworming week and follow-up interviews with the head teachers after the process of drug administration at the schools revealed that %.0f%% of schools had sufficient drugs to deworm all children present. Read more on drug and material distribution on page 17.",
-  value_percent,
-  value_percent2,
-  n_rows  # Add the number of rows as a placeholder argument
-))
+  renderText(sprintf(
+    "● Following teacher training, %.0f%% of the monitored training sessions distributed all key materials (%.0f%% distributed drugs and %.0f%% distributed reporting forms) to teachers to take to their respective schools for deworming day. Direct observation at schools during the deworming week and follow-up interviews with the head teachers after the process of drug administration at the schools revealed that %.0f%% of schools had sufficient drugs to deworm all children present. Read more on drug and material distribution on page 17.",
+    value_percent,
+    value_percent2,
+    value_percent3,
+    n_rows  # Add the number of rows as a placeholder argument
+  ))
 ```
 
 
@@ -634,6 +637,7 @@ SELECT variable,
        SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) as covered_partially
 FROM tt_obs
 WHERE year = 2022
+AND state = 'Rivers'
 AND round = 'Overall'
 AND variable IN ('Overall coverage of recording and reporting forms', 'STH coverage of information on health education- worms', 'Coverage of STH drug distribution', 'Overall coverage of roles and responsibilities', 'Coverage of information on side effects', 'Overall coverage of information on community sensitization')
 GROUP BY variable;
