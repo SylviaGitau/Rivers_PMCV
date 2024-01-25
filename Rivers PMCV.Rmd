@@ -201,7 +201,33 @@ n_rows <- nrow(data)
 ```
 
 
-●	Seventy-three percent (73%) of parents were aware of deworming day, with this proportion higher among parents of enrolled children (86%) as compared to the parents of non-enrolled children (43%). Seventy-six percent (76%) of parents, a 2-percentage point decrease from the previous year , who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (55%) and lack of school enrollment (13%). The primary sources of deworming day information cited by parents were children (74%), followed by teachers (40%). Read more about community sensitization on page 18.
+```{r part4, echo=FALSE}
+
+sql_query <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('Proportion of parents who were aware of deworming activity at school', 'Is child enrolled in school?')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+value_percent <- data$value[data$variable == 'Proportion of parents who were aware of deworming activity at school'] * 100
+value_percent2 <- data$value[data$variable == 'Is child enrolled in school?'] * 100
+
+# Calculate the number of rows
+n_rows <- nrow(data)
+
+# output text
+output_text2 <- sprintf(
+  "● %.0f%% of parents were aware of deworming day, with this proportion higher among parents of enrolled children (%.0f%%) as compared to the parents of non-enrolled children (43%%). Seventy-six percent (76%%) of parents, a 2-percentage point decrease from the previous year, who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (55%%) and lack of school enrollment (13%%). The primary sources of deworming day information cited by parents were children (74%%), followed by teachers (40%%). Read more about community sensitization on page 18.",
+  value_percent,
+  value_percent2,
+  n_rows
+)
+
+renderText(output_text2)
+```
 
 ●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at 100% of schools, and 92% of schools utilized the treatment register. Eighty-five percent (85%) of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23. 
 
