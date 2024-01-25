@@ -207,25 +207,43 @@ sql_query <- "SELECT * FROM cms
 WHERE year = 2022
 AND state = 'Rivers'
 AND round = 'Overall'
-AND (variable = 'Proportion of parents who were aware of deworming activity at school'
-    OR (variable = 'Is child enrolled in school?' OR (variable = 'Why will/did your children NOT get deworming medicine today?' AND attibutes = 'Not aware of the deworming')))"
+AND (
+    variable = 'Proportion of parents who were aware of deworming activity at school'
+    OR (
+        variable = 'Is child enrolled in school?'
+        OR (
+            variable = 'Why will/did your children NOT get deworming medicine today?'
+            AND (attributes = 'Not aware of the deworming' OR attributes = 'Child is not enrolled')
+        )
+        OR (
+            variable = 'ASK: How did you hear about the deworming exercise to be conducted in your community?'
+            AND (attributes = 'My child told me' OR attributes = 'Teacher from a local school')
+        )
+    )
+)"
 
 data <- dbGetQuery(con, sql_query)
 
 # Calculate the percentage and display the text
 value_percent <- data$value[data$variable == 'Proportion of parents who were aware of deworming activity at school'] * 100
 value_percent2 <- data$value[data$variable == 'Is child enrolled in school?'] * 100
-value_percent3 <- data$value[data$variable == 'Why will/did your children NOT get deworming medicine today?' & data$attibutes == 'Not aware of the deworming'] * 100
+value_percent3 <- data$value[data$variable == 'Why will/did your children NOT get deworming medicine today?' & data$attributes == 'Not aware of the deworming'] * 100
+value_percent4 <- data$value[data$variable == 'Why will/did your children NOT get deworming medicine today?' & data$attributes == 'Child is not enrolled'] * 100
+value_percent5 <- data$value[data$variable == 'ASK: How did you hear about the deworming exercise to be conducted in your community?' & data$attributes == 'My child told me'] * 100
+value_percent6 <- data$value[data$variable == 'ASK: How did you hear about the deworming exercise to be conducted in your community?' & data$attributes == 'Teacher from a local school'] * 100
 
 # Calculate the number of rows
 n_rows <- nrow(data)
 
 # output text
 output_text2 <- sprintf(
-  "● %.0f%% of parents were aware of deworming day, with this proportion higher among parents of enrolled children (%.0f%%) as compared to the parents of non-enrolled children (43%%). Seventy-six percent (76%%) of parents, a 2-percentage point decrease from the previous year, who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (%.0f%%) and lack of school enrollment (13%%). The primary sources of deworming day information cited by parents were children (74%%), followed by teachers (40%%). Read more about community sensitization on page 18.",
+  "● %.0f%% of parents were aware of deworming day, with this proportion higher among parents of enrolled children (%.0f%%) as compared to the parents of non-enrolled children (43%%). Seventy-six percent (76%%) of parents, a 2-percentage point decrease from the previous year, who were aware of deworming day, indicated that they would be sending their children for deworming. The main reasons cited for parents not sending children for deworming were lack of awareness (%.0f%%) and lack of school enrollment (%.0f%%). The primary sources of deworming day information cited by parents were children (%.0f%%), followed by teachers (%.0f%%). Read more about community sensitization on page 18.",
   value_percent,
   value_percent2,
   value_percent3,
+  value_percent4,
+  value_percent5,
+  value_percent6,
   n_rows
 )
 
