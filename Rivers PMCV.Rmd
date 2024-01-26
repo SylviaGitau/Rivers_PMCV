@@ -254,26 +254,29 @@ renderText(output_text2)
 ```{r part5, echo=FALSE}
 
 sql_query <- "SELECT * FROM dd_main
-WHERE variable = 'DD protocols'
+WHERE variable IN ('DD protocols', 'Tabs and dosage protocol')
 AND year = 2022
 AND round = 'Overall'
 AND state = 'Rivers'
-AND attributes = 'Trnsferred names prior'"
-
+AND attributes IN ('Trnsferred names prior', 'Treatment register used', 'Children chewed MEB')"
 
 data <- dbGetQuery(con, sql_query)
 
 # Calculate the percentage and display the text
 
-value_percent <- data$value[data$variable == 'DD protocols' & data$attributes == 'Trnsferred names prior'] * 100
+value_percent <- data$value[data$variable == 'Tabs and dosage protocol' & data$attributes == 'Children chewed MEB'] * 100
+value_percent2 <- data$value[data$variable == 'DD protocols' & data$attributes == 'Treatment register used'] * 100
+value_percent3 <- data$value[data$variable == 'DD protocols' & data$attributes == 'Trnsferred names prior'] * 100
 
 # Calculate the number of rows
 n_rows <- nrow(data)
 
 # Use the dynamic values in the output text
   output_text3 <- sprintf(
-    "●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87%% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at 100%% of schools, and 92%% of schools utilized the treatment register. %.0f%% of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23.",
+    "●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87%% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at %.0f%% of schools, and %.0f%% of schools utilized the treatment register. %.0f%% of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23.",
     value_percent,
+    value_percent2,
+    value_percent3,
     n_rows
   )
   
