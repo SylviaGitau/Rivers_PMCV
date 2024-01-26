@@ -250,7 +250,35 @@ output_text2 <- sprintf(
 renderText(output_text2)
 ```
 
-●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at 100% of schools, and 92% of schools utilized the treatment register. Eighty-five percent (85%) of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23. 
+
+```{r part5, echo=FALSE}
+
+sql_query <- "SELECT * FROM dd_main
+WHERE variable = 'DD protocols'
+AND year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND attributes = 'Trnsferred names prior'"
+
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+
+value_percent <- data$value[data$variable == 'DD protocols' & data$attributes == 'Trnsferred names prior'] * 100
+
+# Calculate the number of rows
+n_rows <- nrow(data)
+
+# Use the dynamic values in the output text
+  output_text3 <- sprintf(
+    "●	In both rounds 1 and 2, the program saw an increase in the number of schools distributing mebendazole tablets on deworming day; 87%% of expected schools distributed tablets which is a 27-percentage point increase from the previous year. Teachers administered the correct dosage of mebendazole at 100%% of schools, and 92%% of schools utilized the treatment register. %.0f%% of teachers transferred names from the class register to the treatment register before deworming. Read more on drug administration on page 23.",
+    value_percent,
+    n_rows
+  )
+  
+renderText(output_text3)
+```
 
 Table 1 below provides the round-wise breakdown of Process Monitoring and Coverage Validation results against key indicators.
 
@@ -334,15 +362,38 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     </tr>
     <tr>
       <td>Target school utilizing at least one awareness activity or material</td>
-      <td>53%</td>
-      <td>83%</td>
-      <td>68%</td>
+      ```{r awareness-activity, results='asis'}
+      query_awareness_activity <- "SELECT Round, SUM(value) AS total_sum FROM dd_main
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND variable = '<b>DO NOT READ THIS ALOUD: </b> Check the placement of the posters and record the most appropriate answer.'
+                                  AND attributes IN ('Clearly posted/visible to all', 'Hidden in a room/partially visible')
+                                  AND Round IN ('Round 1', 'Round 2', 'Overall')
+                                  GROUP BY Round
+                                  ORDER BY CASE
+                                  WHEN Round = 'Round 1' THEN 1
+                                  WHEN Round = 'Round 2' THEN 2
+                                  ELSE 3
+                                END"
+      awareness_activity_data <- dbGetQuery(con, query_awareness_activity)
+      for (i in 1:nrow(awareness_activity_data)) {
+        cat("<td>", scales::percent(awareness_activity_data$total_sum[i]), "</td>")
+      }
+      ```
     </tr>
     <tr>
       <td>Community members who report seeing or hearing about deworming through IEC deworming materials or word of mouth this year</td>
-      <td>70%</td>
-      <td>77%</td>
-      <td>73%</td>
+      ```{r hearing-deworming, results='asis'}
+      query_hearing_deworming <- "SELECT Round, value FROM cms
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND variable = 'Proportion of parents who were aware of deworming activity at school'
+                                  AND Round IN ('Round 1', 'Round 2', 'Overall')"
+      hearing_deworming_data <- dbGetQuery(con, query_hearing_deworming)
+      for (i in 1:nrow(hearing_deworming_data)) {
+        cat("<td>", scales::percent(hearing_deworming_data$value[i]), "</td>")
+      }
+      ```
     </tr>
     <tr>
       <td>Target schools distributing tablets on deworming day</td>
