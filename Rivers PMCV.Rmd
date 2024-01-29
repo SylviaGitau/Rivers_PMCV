@@ -653,7 +653,7 @@ renderText(sprintf(
 
 ##### **Figure 2: Training attendance, methods, and venue**
 
-```{r bar plot, echo=FALSE}
+```{r plot, echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
@@ -665,6 +665,7 @@ sql_query_lga <- "SELECT variable, value
  AND round = 'Overall'
  AND year = 2022
  AND (variable = 'Attendance rate at the start' OR variable = 'Day 1 overall attendance rate' OR  variable = 'Day 2 overall attendance rate')"
+
 data_lga <- dbGetQuery(con, sql_query_lga)
 
 # Mapping original variable names to desired names(lga)
@@ -681,6 +682,7 @@ sql_query_tt <- "SELECT variable, value
  WHERE year = 2022
  AND round = 'Overall'
  AND variable IN ('timely_attendance', 'School attendance Rate', 'Teachers attendance rate')"
+
 data_tt <- dbGetQuery(con, sql_query_tt)
 
 # Mapping original variable names to desired names(tt)
@@ -690,6 +692,16 @@ variable_mapping_tt <- c('timely_attendance' = 'Timely attendance of teachers(n=
 
 # Apply the mapping to the 'variable' column in data_tt
 data_tt$variable_mapped <- variable_mapping_tt[data_tt$variable]
+
+# SQL query with a WHERE clause for the state of Rivers (TT2 data)
+sql_query_tt2 <- "SELECT *
+FROM tt_obs
+WHERE year = 2022
+AND round = 'Overall'
+AND variable = 'Overall Training methods employed'
+AND attibutes != 'Group work'"
+
+data_tt2 <- dbGetQuery(con, sql_query_tt2)
 
 # Plotting for LGA data
 plot_lga <- ggplot(data_lga, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
@@ -709,14 +721,19 @@ plot_tt <- ggplot(data_tt, aes(x = variable_mapped, y = value, fill = variable_m
     theme_minimal() +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
+# Plotting for TT2 data
+plot_tt2 <- ggplot(data_tt2, aes(x = attibutes, y = value, fill = variable)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
+    labs(title = "Teacher training methods (n=47):", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
 # Arrange plots vertically
-grid.arrange(plot_lga, plot_tt, ncol = 1)
+grid.arrange(plot_lga, plot_tt, plot_tt2, ncol = 1)
 
 ```
-
-
-
-![](https://i.postimg.cc/qRmfmfzd/figure-2.jpg)
 
 
 #### <span style="color:#fe6e87;">Topic coverage</span>
