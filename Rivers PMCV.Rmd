@@ -328,7 +328,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
 
 <!-- Your Table -->
 <div class="custom-table">
-  <table>
+  <table style="empty-cells: show;">
     <tr class="process-monitoring">
       <td>Process Monitoring</td>
       <td>Year 6, Round 1</td>
@@ -338,36 +338,59 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     <tr>
       <td>Target schools represented at teacher training</td>
       ```{r school_attendance, results='asis'}
-      query_school_attendance <- "SELECT Round, value FROM tt_obs
+      query_school_attendance <- "SELECT round, value FROM tt_obs
                                   WHERE year = 2022
                                   AND state = 'Rivers'
                                   AND variable = 'School attendance Rate'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       school_attendance_data <- dbGetQuery(con, query_school_attendance)
-      for (i in 1:nrow(school_attendance_data)) {
-        cat("<td>", scales::percent(school_attendance_data$value[i]), "</td>")
+      
+      rounds <- c('Round 1', 'Round 2', 'Overall')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(school_attendance_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(school_attendance_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
       }
       ```
     </tr>
     <tr>
       <td>Target schools with adequate drugs during deworming</td>
       ```{r adequate-drugs, results='asis'}
-      query_adequate_drugs <- "SELECT Round, value FROM dd_main
+      query_adequate_drugs <- "SELECT round, value FROM dd_main
                                   WHERE year = 2022
                                   AND state = 'Rivers'
+                                  AND attributes = 'Yes'
                                   AND variable = 'ASK:Were deworming medicines sufficient for today?'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       adequate_drugs_data <- dbGetQuery(con, query_adequate_drugs)
-      for (i in 1:nrow(school_attendance_data)) {
-        cat("<td>", scales::percent(adequate_drugs_data$value[i]), "</td>")
+      
+      rounds <- c('Round 1', 'Round 2', 'Overall')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(adequate_drugs_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(adequate_drugs_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
       }
       ```
     </tr>
     <tr>
-      <td>Target school utilizing at least one awareness activity or material</td>
+    <td>Target school utilizing at least one awareness activity or material</td>
       ```{r awareness-activity, results='asis'}
-      query_awareness_activity <- "SELECT Round, SUM(value) AS total_sum FROM dd_main
-                                  WHERE year = 2022
+      query_awareness_activity <- "SELECT round, SUM(value) AS total_sum FROM dd_main
+                                  WHERE year = 2023
                                   AND state = 'Rivers'
                                   AND variable = '<b>DO NOT READ THIS ALOUD: </b> Check the placement of the posters and record the most appropriate answer.'
                                   AND attributes IN ('Clearly posted/visible to all', 'Hidden in a room/partially visible')
@@ -379,25 +402,47 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
                                   ELSE 3
                                 END"
       awareness_activity_data <- dbGetQuery(con, query_awareness_activity)
-      for (i in 1:nrow(awareness_activity_data)) {
-        cat("<td>", scales::percent(awareness_activity_data$total_sum[i]), "</td>")
+      
+      rounds <- c('Round 1', 'Round 2', 'Overall')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(awareness_activity_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(awareness_activity_data$total_sum[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
       }
       ```
-    </tr>
-    <tr>
-      <td>Community members who report seeing or hearing about deworming through IEC deworming materials or word of mouth this year</td>
+      </tr>
+   <tr>
+    <td>Community members who report seeing or hearing about deworming through IEC deworming materials or word of mouth this year</td>
       ```{r hearing-deworming, results='asis'}
-      query_hearing_deworming <- "SELECT Round, value FROM cms
-                                  WHERE year = 2022
+      query_hearing_deworming <- "SELECT round, value FROM cms
+                                  WHERE year = 2023
                                   AND state = 'Rivers'
                                   AND variable = 'Proportion of parents who were aware of deworming activity at school'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       hearing_deworming_data <- dbGetQuery(con, query_hearing_deworming)
-      for (i in 1:nrow(hearing_deworming_data)) {
-        cat("<td>", scales::percent(hearing_deworming_data$value[i]), "</td>")
+      
+      rounds <- c('Round 1', 'Round 2', 'Overall')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(hearing_deworming_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(hearing_deworming_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
       }
       ```
-    </tr>
+      </tr>
     <tr>
       <td>Target schools distributing tablets on deworming day</td>
       <td>100%</td>
@@ -407,14 +452,25 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     <tr>
       <td>Enrolled children present in school on deworming day</td>
       ```{r enrolled-children, results='asis'}
-      query_enrolled_children <- "SELECT Round, value FROM dd_main
+      query_enrolled_children <- "SELECT round, value FROM dd_main
                                   WHERE year = 2022
                                   AND state = 'Rivers'
                                   AND variable = 'Proportion of students who were present on DD'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       enrolled_children_data <- dbGetQuery(con, query_enrolled_children)
-      for (i in 1:nrow(enrolled_children_data)) {
-        cat("<td>", scales::percent(enrolled_children_data$value[i]), "</td>")
+      
+      rounds <- c('Round 1', 'Round 2', 'Overall')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(enrolled_children_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(enrolled_children_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
       }
       ```
     </tr>
