@@ -792,6 +792,122 @@ grid.arrange(plot_lga, plot_tt, plot_tt2, ncol = 1)
 ```
 
 
+On average, 64% of expected schools had a representative in attendance at the monitored teacher training sessions, with 58% of teachers on-time - **Figure 2.**  During TT post-training interviews, 91% of attendees reported attending the entire training. An attendance register was noted across 93% of LGA trainings and all (100%) TTs were monitored - **Figure 3.**
+
+
+##### **Figure 3: Composition of trainers, trainees, and register availability in TTs**
+
+```{r figure3, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+
+# SQL query
+sql_query1 <- "SELECT * FROM tt_admin
+              WHERE year = 2022
+              AND round = 'Overall'
+              AND variable = 'Which ministries , boards, and/or agencies- are all the trainers for this training session from?'"
+
+data <- dbGetQuery(con, sql_query1)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Ministry Of Health(MoH)' = 'Ministry of Health (n=47)',
+                       'Ministry Of Education(MoE).' = 'Ministry of Education (n=47)')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attibutes]
+
+# SQL query
+sql_query2 <- "SELECT 
+    tt.variable,
+    tt.attibutes,
+    CASE 
+        WHEN tt.attibutes IN ('Other:Facilitator', 'Other:N-power') 
+            THEN ot.total_sum
+        ELSE tt.value 
+    END AS total_value
+FROM ttci_prepost tt
+LEFT JOIN (
+    SELECT 
+        variable,
+        SUM(value) AS total_sum
+    FROM ttci_prepost
+    WHERE 
+        year = 2022
+        AND round = 'Overall'
+        AND sourcefile = 'POST'
+        AND variable = 'ASK THE RESPONDENT: What is your position?'
+        AND attibutes IN ('Other:Facilitator', 'Other:N-power')
+    GROUP BY variable
+) ot ON tt.variable = ot.variable
+WHERE 
+    tt.year = 2022
+    AND tt.round = 'Overall'
+    AND tt.sourcefile = 'POST'
+    AND tt.variable = 'ASK THE RESPONDENT: What is your position?'"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Head Teacher Representative' = 'Head teacher representatives',
+                       'Head Teacher' = 'Head teachers',
+                      'Health Teacher' = 'Health teachers',
+                      'Health Teacher Representative' = 'Health teacher representatives',
+                      'Other:Facilitator' = 'Others')
+
+# Creating a new variable with the desired names
+data2$variable_mapped <- variable_mapping[data2$attibutes]
+
+# SQL query
+sql_query3 <- "SELECT * FROM tt_admin
+               WHERE year = 2022
+               AND round = 'Overall'
+               AND variable = 'Can you show me the materials and deworming medicine to be distributed to teachers today?'
+               AND attibutes = 'Class treatment register'"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Class treatment register' = 'Availability of attendance register during teacher training')
+
+# Creating a new variable with the desired names
+data3$variable_mapped <- variable_mapping[data3$attibutes]
+
+# Plotting for trainer data
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Trainer composition:", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Plotting for trainee data
+plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(total_value), y = total_value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Trainee composition (n=182):", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Plotting for attendance_register data
+plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Arrange plots vertically and align them on the left
+grid.arrange(plot, plot2, plot3, ncol = 1)
+```
+
+
 #### <span style="color:#fe6e87;">Topic coverage</span>
 
 Seven topics were meant to be covered across the training sessions. The topic of community sensitization was covered in 94% of the training sessions, while at least 98% of the training sessions covered the other six topics. The topics of recording and reporting forms, health education, target population, and deworming medicine administration were covered in all (100%) training - **Figure 4.** 
