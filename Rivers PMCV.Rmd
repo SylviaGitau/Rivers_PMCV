@@ -903,7 +903,7 @@ plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mappe
     theme_minimal() +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
-# Arrange plots vertically and align them on the left
+# Arrange plots vertically
 grid.arrange(plot, plot2, plot3, ncol = 1)
 ```
 
@@ -971,14 +971,55 @@ ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable_ma
 
 ##### **Figure 5: Health education messages covered in trainings and participants’ pre- and post-training knowledge**
 
+```{r figure 5, echo=FALSE}
 
-/* figure */
+library(ggplot2)
+library(gridExtra)
 
-The coverage of the four health education messages and participants’ post-training recollection, is shown in - Figure 5 above. Post-training interviews with participants revealed that 99% could name at least one way a person becomes infected with worms. Additionally, 70% of teachers shared health messages with children before deworming.
+# SQL query to sum the values for 'Covered Completely' and 'Covered Partially'
+sql_query_sum <- "SELECT variable,
+       SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) as covered_completely,
+       SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) as covered_partially
+	FROM tt_obs   
+WHERE year = 2022
+AND round = 'Overall'
+AND variable IN ('Worms are transmitted by :', 'How was this section (STH PREVENTION) covered?', 'How was this section (STH MORBIDITY) covered?',
+				 'BENEFITS OF DEWORMING IN SCHOOLS')
+GROUP BY variable"
+
+data_sum <- dbGetQuery(con, sql_query_sum)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Worms are transmitted by :' = 'Transimission of worms',
+                       'BENEFITS OF DEWORMING IN SCHOOLS' = 'Purpose of school-based deworming',
+                       'How was this section (STH PREVENTION) covered?' = 'Prevention of worms',
+                       'How was this section (STH MORBIDITY) covered?' = 'Negative effect of worms')
+
+# Creating a new variable with the desired names
+data_sum$variable_mapped <- variable_mapping[data_sum$variable]
+
+# Calculate the total for each variable
+data_sum$total <- rowSums(data_sum[, c("covered_completely", "covered_partially")])
+
+# Plotting for healthEducation topics data
+plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Health education topics completely covered in trainings (n=47)", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+print(plot)
+```
+
+
+The coverage of the four health education messages and participants’ post-training recollection, is shown in - **Figure 5** above. Post-training interviews with participants revealed that 99% could name at least one way a person becomes infected with worms. Additionally, 70% of teachers shared health messages with children before deworming.
 
 #### <span style="color:#fe6e87;">Topic 2: Target Population</span>
 
-Proper identification of the target group is critical to meeting the program goal of treating all eligible at-risk persons. Figure 6 below shows training coverage of the target population and knowledge during deworming day. It also displays training coverage of non-eligible persons, as well as pre- and post-training knowledge scores.
+Proper identification of the target group is critical to meeting the program goal of treating all eligible at-risk persons. **Figure 6** below shows training coverage of the target population and knowledge during deworming day. It also displays training coverage of non-eligible persons, as well as pre- and post-training knowledge scores.
 
 ##### **Figure 6: Information on target population and pre-post knowledge of treatment eligibility criteria**
  /* figure */
