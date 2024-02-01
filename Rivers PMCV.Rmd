@@ -759,7 +759,7 @@ AND attibutes != 'Group work'"
 
 data_tt2 <- dbGetQuery(con, sql_query_tt2)
 
-# Plotting for LGA data
+# Plotting for LGA Training Attendance data
 plot_lga <- ggplot(data_lga, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
@@ -768,7 +768,7 @@ plot_lga <- ggplot(data_lga, aes(x = variable_mapped, y = value, fill = variable
     theme_minimal() +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
-# Plotting for TT data
+# Plotting for TT Training Attendance data
 plot_tt <- ggplot(data_tt, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
@@ -777,7 +777,7 @@ plot_tt <- ggplot(data_tt, aes(x = variable_mapped, y = value, fill = variable_m
     theme_minimal() +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
-# Plotting for TT2 data
+# Plotting for Teacher training methods data
 plot_tt2 <- ggplot(data_tt2, aes(x = attibutes, y = value, fill = variable)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value)), hjust = -0.2, size = 3) +
@@ -971,7 +971,7 @@ ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable_ma
 
 ##### **Figure 5: Health education messages covered in trainings and participants’ pre- and post-training knowledge**
 
-```{r figure 5, echo=FALSE}
+```{r figure 5, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
 
 library(ggplot2)
 library(gridExtra)
@@ -983,6 +983,7 @@ sql_query_sum <- "SELECT variable,
 	FROM tt_obs   
 WHERE year = 2022
 AND round = 'Overall'
+AND state = 'Rivers'
 AND variable IN ('Worms are transmitted by :', 'How was this section (STH PREVENTION) covered?', 'How was this section (STH MORBIDITY) covered?',
 				 'BENEFITS OF DEWORMING IN SCHOOLS')
 GROUP BY variable"
@@ -1001,18 +1002,45 @@ data_sum$variable_mapped <- variable_mapping[data_sum$variable]
 # Calculate the total for each variable
 data_sum$total <- rowSums(data_sum[, c("covered_completely", "covered_partially")])
 
+# SQL query pre&post
+sql_query <- "SELECT * FROM ttci_prepost
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'How do children get infected with worms?'
+AND attibutes IN ('Walking Bare Feet', 'Swimming In Dirty Water', 'Lack Of Proper Hand Washing', 'Absence Of Latrine/Open Defeacation', 'Eating Unwashed Fruits And Vegetables', 'Eating Unwell Cooked/Infected Meat')"
+
+data <- dbGetQuery(con, sql_query)
+
 # Plotting for healthEducation topics data
 plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_mapped)) +
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Health education topics completely covered in trainings (n=47)", x = NULL, y = NULL) +
+    labs(title = "Health education topics", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
     theme(axis.text.x = element_blank())  # Remove x-axis text
 
-print(plot)
+
+# Plotting for tt_pre and tt_post knowledge on transmission
+plot2 <- ggplot(data, aes(x = sourcefile, y = value, fill = sourcefile)) +
+     geom_bar(stat = "identity", position = "dodge", color = "white") +
+     facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  # Remove x-axis text
+     geom_text(aes(label = scales::percent(value), group = attibutes),
+               position = position_dodge(width = 0.8),  
+               vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
+  guides(fill = guide_legend(override.aes = list(title = NULL)))  
+
+# Print the plot
+ grid.arrange(plot, plot2, ncol = 2)
 ```
+
 
 
 The coverage of the four health education messages and participants’ post-training recollection, is shown in - **Figure 5** above. Post-training interviews with participants revealed that 99% could name at least one way a person becomes infected with worms. Additionally, 70% of teachers shared health messages with children before deworming.
@@ -1022,9 +1050,162 @@ The coverage of the four health education messages and participants’ post-trai
 Proper identification of the target group is critical to meeting the program goal of treating all eligible at-risk persons. **Figure 6** below shows training coverage of the target population and knowledge during deworming day. It also displays training coverage of non-eligible persons, as well as pre- and post-training knowledge scores.
 
 ##### **Figure 6: Information on target population and pre-post knowledge of treatment eligibility criteria**
- /* figure */
- 
- /* figure2 */ 
+
+```{r figure6, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+
+# SQL query LGA training
+sql_query <- "SELECT * FROM lga_obs 
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'STH treatment will be provided to all children aged 5-14 years'"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('STH treatment will be provided to all children aged 5-14 years' = 'All children aged 5-14 years will be treated for STH')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$variable]
+
+# SQL query to sum the values for 'Covered Completely' and 'Covered Partially' Teacher training
+sql_query2 <- "SELECT year, state, round, variable,
+  'Teacher Training' AS attibutes,
+  SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+  SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+  year = 2022
+  AND state = 'Rivers'
+  AND round = 'Overall'
+  AND variable = 'STH treatment will be provided to all children aged 5-14 years:'
+  AND attibutes IN ('Covered Completely', 'Covered Partially')
+GROUP BY year, state, round, variable"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('STH treatment will be provided to all children aged 5-14 years:' = 'All children aged 5-14 years will be treated for STH')
+
+# Creating a new variable with the desired names
+data2$variable_mapped <- variable_mapping[data2$variable]
+
+# SQL query deworming team
+sql_query3 <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = '% of deworming team with full knowledge of STH treatment'"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('% of deworming team with full knowledge of STH treatment' = 'School deworming team knowledge of correct age-group (n=60)')
+
+# Creating a new variable with the desired names
+data3$variable_mapped <- variable_mapping[data3$variable]
+
+# Plotting for LGA training data
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "LGA training (n=14)", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Plotting for Teacher training data
+plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_sum, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(total_sum), y = total_sum, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Teacher training (n=47)", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Plotting for deworming team data
+plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Deworming day knowledge of the target age-group", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# plotting
+grid.arrange(plot, plot2, plot3, ncol=1)
+```
+
+
+
+
+
+```{r figure6(ii), echo=FALSE, out.width='80%', fig.height=6}
+
+library(ggplot2)
+library(gridExtra)
+
+# SQL query Non-eligible person covered
+sql_query <- "SELECT * FROM tt_obs
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'According to the trainers, which children should not be treated under the program?'
+AND attibutes IN ('Any child sick on DD', 'Any child with an inherent health condition such as Sickle Cell disease, Epileps','Any child under 5 years')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Any child sick on DD' = 'Sick children',
+                      'Any child under 5 years' = 'Children under 5 years',
+                      'Any child with an inherent health condition such as Sickle Cell disease, Epileps' = 'Children with history of sicle cell disease, epilepsy etc.')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attibutes]
+
+# SQL query Non-eligible person covered
+sql_query2 <- "SELECT * FROM ttci_prepost
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Which category of children should not be given deworming medicine on the deworming day?'
+AND attibutes IN ('Sick children', 'Children under any medication', 'Children with known allergy to deworming medicine', 'Children with history of seizures')"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Plotting for Non-eligible persons data
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = "Non-eligible persons covered in trainings (n=47)", x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.x = element_blank())  # Remove x-axis text
+
+# Plotting for Knowledge on non-eligible person data
+plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
+     geom_bar(stat = "identity", position = "dodge", color = "white") +
+     facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
+     labs(title = "Knowledge on non-eligible persons", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  # Remove x-axis text
+     geom_text(aes(label = scales::percent(value), group = attibutes),
+               position = position_dodge(width = 0.8),  
+               vjust = 0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
+  guides(fill = guide_legend(override.aes = list(title = NULL)))
+
+# Adjust the overall layout to add spacing between the plots
+grid.arrange(plot, plot2, ncol = 1)
+``` 
 
 #### <span style="color:#fe6e87;">Topic 3: Roles and Responsibilities</span>
 
