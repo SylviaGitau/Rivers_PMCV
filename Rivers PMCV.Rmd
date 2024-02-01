@@ -801,6 +801,7 @@ On average, 64% of expected schools had a representative in attendance at the mo
 
 library(ggplot2)
 library(gridExtra)
+library(stringr)
 
 # SQL query
 sql_query1 <- "SELECT * FROM tt_admin
@@ -881,7 +882,8 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
     labs(title = "Trainer composition:", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) +  # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for trainee data
 plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_value, fill = variable_mapped)) +
@@ -891,7 +893,8 @@ plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_value, fill = variable
     labs(title = "Trainee composition (n=182):", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) +  # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for attendance_register data
 plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
@@ -901,9 +904,10 @@ plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mappe
     labs(title = NULL, x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) + # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
-# Arrange plots vertically
+# Arrange plots vertically and align them on the left
 grid.arrange(plot, plot2, plot3, ncol = 1)
 ```
 
@@ -975,6 +979,7 @@ ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable_ma
 
 library(ggplot2)
 library(gridExtra)
+library(stringr)
 
 # SQL query to sum the values for 'Covered Completely' and 'Covered Partially'
 sql_query_sum <- "SELECT variable,
@@ -1017,11 +1022,11 @@ plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_map
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Health education topics", x = NULL, y = NULL) +
+    labs(title = "Health education topics completely covered in trainings (n=47)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
-
+    theme(axis.text.x = element_blank()) +  # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for tt_pre and tt_post knowledge on transmission
 plot2 <- ggplot(data, aes(x = sourcefile, y = value, fill = sourcefile)) +
@@ -1035,12 +1040,12 @@ plot2 <- ggplot(data, aes(x = sourcefile, y = value, fill = sourcefile)) +
                position = position_dodge(width = 0.8),  
                vjust = -0.5, size = 3) +  
      scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
-  guides(fill = guide_legend(override.aes = list(title = NULL)))  
+  guides(fill = guide_legend(override.aes = list(title = NULL))) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Print the plot
  grid.arrange(plot, plot2, ncol = 2)
 ```
-
 
 
 The coverage of the four health education messages and participants’ post-training recollection, is shown in - **Figure 5** above. Post-training interviews with participants revealed that 99% could name at least one way a person becomes infected with worms. Additionally, 70% of teachers shared health messages with children before deworming.
@@ -1055,6 +1060,7 @@ Proper identification of the target group is critical to meeting the program goa
 
 library(ggplot2)
 library(gridExtra)
+library(stringr)
 
 # SQL query LGA training
 sql_query <- "SELECT * FROM lga_obs 
@@ -1116,7 +1122,8 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
     labs(title = "LGA training (n=14)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) +  # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for Teacher training data
 plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_sum, fill = variable_mapped)) +
@@ -1126,7 +1133,8 @@ plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_sum, fill = variable_m
     labs(title = "Teacher training (n=47)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) + # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for deworming team data
 plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
@@ -1136,7 +1144,8 @@ plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mappe
     labs(title = "Deworming day knowledge of the target age-group", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) +  # Remove x-axis text
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # plotting
 grid.arrange(plot, plot2, plot3, ncol=1)
@@ -1150,6 +1159,7 @@ grid.arrange(plot, plot2, plot3, ncol=1)
 
 library(ggplot2)
 library(gridExtra)
+library(stringr)
 
 # SQL query Non-eligible person covered
 sql_query <- "SELECT * FROM tt_obs
@@ -1187,7 +1197,8 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
     labs(title = "Non-eligible persons covered in trainings (n=47)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
-    theme(axis.text.x = element_blank())  # Remove x-axis text
+    theme(axis.text.x = element_blank()) + # Remove x-axis text
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 # Plotting for Knowledge on non-eligible person data
 plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
@@ -1201,11 +1212,13 @@ plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
                position = position_dodge(width = 0.8),  
                vjust = 0.5, size = 3) +  
      scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
-  guides(fill = guide_legend(override.aes = list(title = NULL)))
+  guides(fill = guide_legend(override.aes = list(title = NULL)))+
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
 
 # Adjust the overall layout to add spacing between the plots
 grid.arrange(plot, plot2, ncol = 1)
-``` 
+```
 
 #### <span style="color:#fe6e87;">Topic 3: Roles and Responsibilities</span>
 
@@ -1213,13 +1226,85 @@ The success of the MDA hinges on the proper identification of the contributions 
 
 ##### **Figure 7: Roles and responsibilities covered by trainers in LGA and teacher trainings**
 
-/* figure 1 */
+```{r figure 7, echo=FALSE}
 
-/* figure 2 */
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+# sql query responsibilities of teachers tt
+sql_query <- "SELECT * FROM tt_obs
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'According to the trainers, what is the role of the teachers/CIs in the deworming program?'
+AND attibutes IN ('To organize drug administration in schools', 'To disseminate health education messages for children and parents during assembl','To mobilize non-enrolled school-aged children','To complete forms for registration and reporting')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('To organize drug administration in schools' = 'To organize administration of deworming medicine in schools',
+                       'To disseminate health education messages for children and parents during assembl' = 'To disseminate health education messages for children and parents during assembly and PTA meeting',
+                      'To mobilize non-enrolled school-aged children' = 'To mobilize non-enrolled school-aged children',
+                      'To complete forms for registration and reporting' = 'To complete forms for registration and reporting')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attibutes]
+
+# Plotting for Non-eligible persons data
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Responsibilities of teachers covered during teacher training (n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+```
+
+
+
+```{r figure7(ii), echo = FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+# sql query responsibilities of flhf staff
+sql_query <- "SELECT * FROM tt_obs
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'According to the trainers, what is the role of the frontline health facility staff in the deworming program?'
+AND attibutes IN  ('To communicate the rationale of the intervention to community leaders',
+'To participate in community awareness creation for drug administration campaign', 'To manage side-effects', 'To manage, refer, and report children with severe adverse effects', 'To help with treating non-enrolled children')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Plotting for responsibilities of flhf staff data
+plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Responsibilities of FLHF staff covered during teacher training (n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+
+```
+
 
 **Figure 8**, below, shows frontline health facility (FLHF) staff knowledge of their roles and responsibilities on deworming day.
 
 ##### **Figure 8: Self-reported roles during deworming day**
+
+/* figure */
 
 #### <span style="color:#fe6e87;">Topic 4: Community Sensitization</span>
 
