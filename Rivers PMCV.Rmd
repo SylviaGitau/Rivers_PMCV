@@ -453,7 +453,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
       <td>Enrolled children present in school on deworming day</td>
       ```{r enrolled-children, results='asis'}
       query_enrolled_children <- "SELECT round, value FROM dd_main
-                                  WHERE year = 2022
+                                  WHERE year = 2023
                                   AND state = 'Rivers'
                                   AND variable = 'Proportion of students who were present on DD'
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
@@ -1022,7 +1022,7 @@ plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_map
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Health education topics completely covered in trainings (n=47)", x = NULL, y = NULL) +
+    labs(title = "Health education topics\ncompletely covered in trainings (n=47)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
     theme(axis.text.x = element_blank()) +  # Remove x-axis text
@@ -1032,7 +1032,7 @@ plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_map
 plot2 <- ggplot(data, aes(x = sourcefile, y = value, fill = sourcefile)) +
      geom_bar(stat = "identity", position = "dodge", color = "white") +
      facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
-     labs(title = NULL, x = NULL, y = NULL) +
+     labs(title = "Pre- and post-\nknowledge on transimission", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  # Remove x-axis text
@@ -1304,7 +1304,44 @@ print(plot)
 
 ##### **Figure 8: Self-reported roles during deworming day**
 
-/* figure */
+```{r figure8, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+# sql query to get data (self-reported roles during deworming day)
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'ASK: What are your responsibilities as a FLHF in the School-based Deworming Program?'
+AND attributes IN ('Community Sensitization', 'Support Teachers on SAE', 'Orient FLHF Staff on the SBDP', 'Other:Supervisor')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Support Teachers on SAE' = 'Support teachers on severe adverse events (SAE)',
+                      'Community Sensitization' = 'Community Sensitization',
+                      'Orient FLHF Staff on the SBDP' = 'Orient FLHF Staff on the school-based deworming program (SBDP)',
+                      'Other:Supervisor' = 'Supervision of schools')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attributes]
+
+# Plotting
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "FLHF knowledge of roles during deworming day (n=28)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+```
+
 
 #### <span style="color:#fe6e87;">Topic 4: Community Sensitization</span>
 
@@ -1312,7 +1349,60 @@ Raising awareness of the MDA within the target geographic area and population is
 
 ##### **Figure 9: Community sensitization topics covered by trainers and post-training knowledge**
 
-/* figure1 */
+```{r figure9, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+# sql query to get data (messages covered under commmunity sensitization)
+sql_query <- "SELECT * FROM tt_obs
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'According to the trainers, what is the responsibility of the teacher/CI in community sensitization and mobilization?'
+AND attibutes IN ('Conduct Health Education on assembly ground', 'Display Posters in the School', 'Discuss DD at School Management Meetings','Encourage Children to share DD Information with Parents')"
+
+data <- dbGetQuery(con, sql_query)
+
+# sql query to get data (Post-knowledge on sensitization roles)
+sql_query2 <- "SELECT * FROM ttci_prepost
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'What are some of your responsibilities relating to community sensitization?'
+AND attibutes IN ('Display Posters', 'Conduct health education in classrooms', 'Reach out to non-enrolled children and invite for deworming Day in my school', 'Share Deworming message during School Management Meetings',                       
+'Announce deworming message in school assembly',
+'Training and sensitizing other teachers',
+'Encourage Children to share Deworming Day Information with Parents')"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Plotting 1
+plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Messages covered under\ncommunity sensitization during\nteacher training (n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Plotting 2
+plot2 <- ggplot(data2, aes(x = attibutes, y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Post-knowledge on\nsensitization roles", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+grid.arrange(plot, plot2, ncol = 2)
+```
+
 
 /* figure2 */
 
