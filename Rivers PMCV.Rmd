@@ -1022,7 +1022,9 @@ plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_map
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
+
     labs(title = "Health education topics\ncompletely covered in trainings (n=47)", x = NULL, y = NULL) +
+
     coord_flip() +
     theme_minimal() +
     theme(axis.text.x = element_blank()) +  # Remove x-axis text
@@ -1304,6 +1306,7 @@ print(plot)
 
 ##### **Figure 8: Self-reported roles during deworming day**
 
+
 ```{r figure8, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
 library(ggplot2)
 library(gridExtra)
@@ -1341,6 +1344,8 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
 
 print(plot)
 ```
+
+/* figure */
 
 
 #### <span style="color:#fe6e87;">Topic 4: Community Sensitization</span>
