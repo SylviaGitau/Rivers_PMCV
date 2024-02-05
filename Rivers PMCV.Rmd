@@ -975,7 +975,7 @@ ggplot(data_sum, aes(x = covered_completely + covered_partially, y = variable_ma
 
 ##### **Figure 5: Health education messages covered in trainings and participants’ pre- and post-training knowledge**
 
-```{r figure 5, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+```{r figure 5, echo=FALSE, fig.height=6, fig.width = 8}
 
 library(ggplot2)
 library(gridExtra)
@@ -1157,7 +1157,7 @@ grid.arrange(plot, plot2, plot3, ncol=1)
 
 
 
-```{r figure6(ii), echo=FALSE, out.width='80%', fig.height=6}
+```{r figure6(ii), echo=FALSE, fig.width=8, fig.height=6 }
 
 library(ggplot2)
 library(gridExtra)
@@ -1181,6 +1181,9 @@ variable_mapping <- c('Any child sick on DD' = 'Sick children',
 # Creating a new variable with the desired names
 data$variable_mapped <- variable_mapping[data$attibutes]
 
+# Use reorder to arrange bars from smallest to highest
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
+
 # SQL query Non-eligible person covered
 sql_query2 <- "SELECT * FROM ttci_prepost
 WHERE year = 2022
@@ -1196,7 +1199,7 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Non-eligible persons covered in trainings (n=47)", x = NULL, y = NULL) +
+    labs(title = "Non-eligible persons covered\nin trainings (n=47)", x = NULL, y = NULL) +
     coord_flip() +
     theme_minimal() +
     theme(axis.text.x = element_blank()) + # Remove x-axis text
@@ -1219,7 +1222,7 @@ plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
 
 
 # Adjust the overall layout to add spacing between the plots
-grid.arrange(plot, plot2, ncol = 1)
+grid.arrange(plot, plot2, ncol = 2)
 ```
 
 #### <span style="color:#fe6e87;">Topic 3: Roles and Responsibilities</span>
@@ -1252,6 +1255,9 @@ variable_mapping <- c('To organize drug administration in schools' = 'To organiz
 
 # Creating a new variable with the desired names
 data$variable_mapped <- variable_mapping[data$attibutes]
+
+# Use reorder to arrange bars based on value
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
 
 # Plotting for Non-eligible persons data
 plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
@@ -1286,6 +1292,9 @@ AND attibutes IN  ('To communicate the rationale of the intervention to communit
 
 data <- dbGetQuery(con, sql_query)
 
+# Use reorder to arrange bars based on value
+data$attibutes <- reorder(data$attibutes, data$value)
+
 # Plotting for responsibilities of flhf staff data
 plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
@@ -1307,7 +1316,8 @@ print(plot)
 ##### **Figure 8: Self-reported roles during deworming day**
 
 
-```{r figure8, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+```{r figure8, echo=FALSE}
+
 library(ggplot2)
 library(gridExtra)
 library(stringr)
@@ -1330,6 +1340,9 @@ variable_mapping <- c('Support Teachers on SAE' = 'Support teachers on severe ad
 
 # Creating a new variable with the desired names
 data$variable_mapped <- variable_mapping[data$attributes]
+
+# Use reorder to arrange bars based on value
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
 
 # Plotting
 plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
@@ -1354,13 +1367,13 @@ Raising awareness of the MDA within the target geographic area and population is
 
 ##### **Figure 9: Community sensitization topics covered by trainers and post-training knowledge**
 
-```{r figure9, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+```{r figure9, echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
 library(stringr)
 
-# sql query to get data (messages covered under commmunity sensitization)
+# sql query to get data (messages covered under community sensitization)
 sql_query <- "SELECT * FROM tt_obs
 WHERE year = 2022
 AND round = 'Overall'
@@ -1369,6 +1382,9 @@ AND variable = 'According to the trainers, what is the responsibility of the tea
 AND attibutes IN ('Conduct Health Education on assembly ground', 'Display Posters in the School', 'Discuss DD at School Management Meetings','Encourage Children to share DD Information with Parents')"
 
 data <- dbGetQuery(con, sql_query)
+
+# Use reorder to arrange bars from smallest to highest
+data$attibutes <- reorder(data$attibutes, data$value)
 
 # sql query to get data (Post-knowledge on sensitization roles)
 sql_query2 <- "SELECT * FROM ttci_prepost
@@ -1382,6 +1398,9 @@ AND attibutes IN ('Display Posters', 'Conduct health education in classrooms', '
 'Encourage Children to share Deworming Day Information with Parents')"
 
 data2 <- dbGetQuery(con, sql_query2)
+
+# Use reorder to arrange bars from smallest to highest
+data2$attibutes <- reorder(data2$attibutes, data2$value)
 
 # Plotting 1
 plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
@@ -1417,7 +1436,46 @@ During MDAs, teachers are required to fill out treatment registers at the class 
 
 ##### **Figure 10: Messages shared about reporting forms and participants’ post-training knowledge**
 
-/* figure1 */
+```{r figure10, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: What form will you or the designated teacher use to summarize school treatment?', 'Which recording and reporting forms are you responsible for?')
+AND attributes IN ('School summary form', 'Treatment register')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('School summary form' = 'School summary form by head teacher',
+                      'Treatment register' = 'Treatment register by the deworming team')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attributes]
+
+# Use reorder to arrange bars based on value
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
+
+# plotting
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="Head teacher and class teacher\nknowledge of forms to be\nfilled on deworming day (n=60)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+
+```
+
 
 #### <span style="color:#fe6e87;">Topic 6: Drug Administration</span>
 
@@ -1509,7 +1567,46 @@ On deworming day, every member of the deworming team (100%) knew the correct dos
 
 ##### **Figure 11: Deworming team knowledge of drugs and dosage on deworming day (n=60)** 
 
-/* figure */
+```{r figure11, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+# sql query to get data
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('What drug was used for the treatment of STH?','What is the dosage for the treatment of STH?')
+AND attributes IN ('Mebendazole/Albendazole','One tablet per child')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('One tablet per child' = 'STH dosage is one tablet per child',
+                      'Mebendazole/Albendazole' = 'STH drug is mebendazole')
+
+# Creating a new variable with the desired names
+data$variable_mapped <- variable_mapping[data$attributes]
+
+# Use reorder to arrange bars based on value
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
+
+# Plotting
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+
+```
 
 #### <span style="color:#fe6e87;">Topic 7: Side Effects</span>
 
@@ -1517,7 +1614,38 @@ Side effects are potential outcomes of any treatment that may or may not be dire
 
 ##### **Figure 12: Messages shared about side effects, participants’ pre- and post-training knowledge and FLHF on deworming day** 
 
-/* figure 1 */
+```{r figure12, echo=FALSE, fig.height=6, fig.width = 8}
+
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+sql_query <- "SELECT * FROM tt_obs
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'According to the trainers, the potential side effects of receiving deworming treatment may include:'
+AND attibutes IN ('Nausea', 'Abdominal Pain', 'Fatigue', 'Vomiting', 'Diarrhoea', 'Malaise', 'Fainting')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Use reorder to arrange bars from smallest to highest
+data$attibutes <- reorder(data$attibutes, data$value)
+
+# plotting
+plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+```
 
 /* figure 2 */
 
