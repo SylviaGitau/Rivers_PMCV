@@ -1504,7 +1504,7 @@ The drug administration topic was covered in all (100%) LGA and teacher training
 </style>
 
 <!-- Table -->
-<table class="custom-table">
+<table class="custom-table" style="empty-cells: show;">
   <thead>
     <tr>
       <th>MDA Practice</th>
@@ -1516,52 +1516,573 @@ The drug administration topic was covered in all (100%) LGA and teacher training
   <tbody>
     <tr>
       <td>One mebendazole tablet to be given to each child</td>
-      <td>100%</td>
-      <td>100%</td>
+        ```{r one_meb, results='asis'}
+query_one_meb <- "SELECT year, state, round, variable,
+    'MEB' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'One Tablet Per Child For Mebendazole/Albendazole'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+one_meb_data <- dbGetQuery(con, query_one_meb)
+
+if (nrow(one_meb_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(one_meb_data)) {
+    cat("<td>")
+    if (!is.na(one_meb_data$total_sum[i])) {
+      cat(scales::percent(one_meb_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r one_meb2, results='asis'}
+query_one_meb2 <- "SELECT year, state, round, variable,
+    'MEB' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'One Tablet of Mebendazole/Albendazole Per Child For STH:'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+one_meb_data2 <- dbGetQuery(con, query_one_meb2)
+
+if (nrow(one_meb_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(one_meb_data2)) {
+    cat("<td>")
+    if (!is.na(one_meb_data2$total_sum[i])) {
+      cat(scales::percent(one_meb_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>STH drug is mebendazole</td>
-      <td>100%</td>
-      <td>100%</td>
+      ```{r drug_meb, results='asis'}
+query_drug_meb <- "SELECT year, state, round, variable,
+    'DRUG' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'The drug used for STH will be Mebendazole/Albendazole'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+drug_meb_data <- dbGetQuery(con, query_drug_meb)
+
+if (nrow(drug_meb_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(drug_meb_data)) {
+    cat("<td>")
+    if (!is.na(drug_meb_data$total_sum[i])) {
+      cat(scales::percent(drug_meb_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+       ```{r drug_meb2, results='asis'}
+query_drug_meb2 <- "SELECT year, state, round, variable,
+    'DRUG' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'The drug used for STH will be Mebendazole/Albendazole:'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+drug_meb_data2 <- dbGetQuery(con, query_drug_meb2)
+
+if (nrow(drug_meb_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(drug_meb_data2)) {
+    cat("<td>")
+    if (!is.na(drug_meb_data2$total_sum[i])) {
+      cat(scales::percent(drug_meb_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Register enrolled children before deworming day and non-enrolled children on deworming day, before treatment</td>
-      <td>100%</td>
-      <td>91%</td>
+       ```{r register_children, results='asis'}
+query_register_children <- "SELECT year, state, round, variable,
+    'REGISTER' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Names of all enrolled children need to be copied from the class register on to the treatment register before deworming day.'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+register_children_data <- dbGetQuery(con, query_register_children)
+
+if (nrow(register_children_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(register_children_data)) {
+    cat("<td>")
+    if (!is.na(register_children_data$total_sum[i])) {
+      cat(scales::percent(register_children_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r register_children2, results='asis'}
+query_register_children2 <- "SELECT year, state, round, variable,
+    'REGISTER' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'REGISTER CHILD'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+register_children_data2 <- dbGetQuery(con, query_register_children2)
+
+if (nrow(register_children_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(register_children_data2)) {
+    cat("<td>")
+    if (!is.na(register_children_data2$total_sum[i])) {
+      cat(scales::percent(register_children_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Complete class level summary form as the child is treated</td>
-      <td>100%</td>
-      <td>98%</td>
+      ```{r complete_form, results='asis'}
+query_complete_form <- "SELECT year, state, round, variable,
+    'COMPLETE' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Complete treatment register as child is treated.'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+complete_form_data <- dbGetQuery(con, query_complete_form)
+
+if (nrow(complete_form_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(complete_form_data)) {
+    cat("<td>")
+    if (!is.na(complete_form_data$total_sum[i])) {
+      cat(scales::percent(complete_form_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r complete_form2, results='asis'}
+query_complete_form2 <- "SELECT year, state, round, variable,
+    'COMPLETE' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'COMPLETE REGISTRATION'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+complete_form_data2 <- dbGetQuery(con, query_complete_form2)
+
+if (nrow(complete_form_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(complete_form_data2)) {
+    cat("<td>")
+    if (!is.na(complete_form_data2$total_sum[i])) {
+      cat(scales::percent(complete_form_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Facilitate hand washing before treatment</td>
-      <td>86%</td>
-      <td>79%</td>
+      ```{r hand_washing, results='asis'}
+query_hand_washing <- "SELECT year, state, round, variable,
+    'HANDWASHING' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Facilitate hand washing prior to treatment'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+hand_washing_data <- dbGetQuery(con, query_hand_washing)
+
+if (nrow(hand_washing_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(hand_washing_data)) {
+    cat("<td>")
+    if (!is.na(hand_washing_data$total_sum[i])) {
+      cat(scales::percent(hand_washing_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    ```{r hand_washing2, results='asis'}
+query_hand_washing2 <- "SELECT year, state, round, variable,
+    'HANDWASHING' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'HANDWASHING'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+hand_washing_data2 <- dbGetQuery(con, query_hand_washing2)
+
+if (nrow(hand_washing_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(hand_washing_data2)) {
+    cat("<td>")
+    if (!is.na(hand_washing_data2$total_sum[i])) {
+      cat(scales::percent(hand_washing_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Observe the child’s mouth to see if each child chews and swallows the tablet</td>
-      <td>100%</td>
-      <td>77%</td>
+      ```{r check_mouth, results='asis'}
+query_check_mouth <- "SELECT year, state, round, variable,
+    'CHECKMOUTH' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Check child’s mouth to make sure that each child chews and swallows the tablet'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+check_mouth_data <- dbGetQuery(con, query_check_mouth)
+
+if (nrow(check_mouth_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(check_mouth_data)) {
+    cat("<td>")
+    if (!is.na(check_mouth_data$total_sum[i])) {
+      cat(scales::percent(check_mouth_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r check_mouth2, results='asis'}
+query_check_mouth2 <- "SELECT year, state, round, variable,
+    'CHECKMOUTH' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'CHECK MOUTH'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+check_mouth_data2 <- dbGetQuery(con, query_check_mouth2)
+
+if (nrow(check_mouth_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(check_mouth_data2)) {
+    cat("<td>")
+    if (!is.na(check_mouth_data2$total_sum[i])) {
+      cat(scales::percent(check_mouth_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Under no circumstances should a child be forced to swallow the medicine</td>
-      <td>100%</td>
-      <td>90%</td>
+      ```{r forced_swallow, results='asis'}
+query_forced_swallow <- "SELECT year, state, round, variable,
+    'FORCECHILD' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2023
+    AND state = 'Rivers'
+    AND round = 'Round 1'
+    AND variable = 'Under no circumstances should a child be forced to swallow the medicine'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+forced_swallow_data <- dbGetQuery(con, query_forced_swallow)
+
+if (nrow(forced_swallow_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(forced_swallow_data)) {
+    cat("<td>")
+    if (!is.na(forced_swallow_data$total_sum[i])) {
+      cat(scales::percent(forced_swallow_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r forced_swallow2, results='asis'}
+query_forced_swallow2 <- "SELECT year, state, round, variable,
+    'FORCECHILD' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'DO NOT FORCE A CHILD.'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+forced_swallow_data2 <- dbGetQuery(con, query_forced_swallow2)
+
+if (nrow(forced_swallow_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(forced_swallow_data2)) {
+    cat("<td>")
+    if (!is.na(forced_swallow_data2$total_sum[i])) {
+      cat(scales::percent(forced_swallow_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Under the program, all drugs are free, safe and effective</td>
-      <td>100%</td>
-      <td>91%</td>
+      ```{r drug_safe, results='asis'}
+query_drug_safe <- "SELECT year, state, round, variable,
+    'SAFEDRUG' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Under the program, all drugs are free, safe and effective:'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+drug_safe_data <- dbGetQuery(con, query_drug_safe)
+
+if (nrow(drug_safe_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(drug_safe_data)) {
+    cat("<td>")
+    if (!is.na(drug_safe_data$total_sum[i])) {
+      cat(scales::percent(drug_safe_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r drug_safe2, results='asis'}
+query_drug_safe2 <- "SELECT year, state, round, variable,
+    'SAFEDRUG' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Under the program, all drugs are free, safe and effective:'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+drug_safe_data2 <- dbGetQuery(con, query_drug_safe2)
+
+if (nrow(drug_safe_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(drug_safe_data2)) {
+    cat("<td>")
+    if (!is.na(drug_safe_data2$total_sum[i])) {
+      cat(scales::percent(drug_safe_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
     <tr>
       <td>Drugs must be stored in a clean, safe, dry and cool location</td>
-      <td>93%</td>
-      <td>83%</td>
+      ```{r store_safe, results='asis'}
+query_store_safe <- "SELECT year, state, round, variable,
+    'STORESAFE' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM lga_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Drugs must be stored in a clean, safe, dry and cool location:'
+    AND attibutes IN ('Covered Partially', 'Covered in Detail')
+GROUP BY year, state, round, variable"
+
+store_safe_data <- dbGetQuery(con, query_store_safe)
+
+if (nrow(store_safe_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(store_safe_data)) {
+    cat("<td>")
+    if (!is.na(store_safe_data$total_sum[i])) {
+      cat(scales::percent(store_safe_data$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+      ```{r store_safe2, results='asis'}
+query_store_safe2 <- "SELECT year, state, round, variable,
+    'STORESAFE' AS attributes,
+    SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+    SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+FROM tt_obs
+WHERE
+    year = 2022
+    AND state = 'Rivers'
+    AND round = 'Overall'
+    AND variable = 'Drugs must be stored in a clean, safe, dry and cool location:'
+    AND attibutes IN ('Covered Partially', 'Covered Completely')
+GROUP BY year, state, round, variable"
+
+store_safe_data2 <- dbGetQuery(con, query_store_safe2)
+
+if (nrow(store_safe_data2) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(store_safe_data2)) {
+    cat("<td>")
+    if (!is.na(store_safe_data2$total_sum[i])) {
+      cat(scales::percent(store_safe_data2$total_sum[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
     </tr>
   </tbody>
 </table>
-
 
 On deworming day, every member of the deworming team (100%) knew the correct dosage, and that the drug used for treatment was mebendazole - **Figure 11.** 
 
@@ -1616,11 +2137,11 @@ Side effects are potential outcomes of any treatment that may or may not be dire
 
 ```{r figure12, echo=FALSE, fig.height=6, fig.width = 8}
 
-
 library(ggplot2)
 library(gridExtra)
 library(stringr)
 
+# sql query messages covered under side effects
 sql_query <- "SELECT * FROM tt_obs
 WHERE year = 2022
 AND state = 'Rivers'
@@ -1633,18 +2154,42 @@ data <- dbGetQuery(con, sql_query)
 # Use reorder to arrange bars from smallest to highest
 data$attibutes <- reorder(data$attibutes, data$value)
 
+# sql query pre & post knowledge
+sql_query2 <- "SELECT * FROM ttci_prepost
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'What mild side effects are considered normal while treating for STH?'
+AND attibutes IN ('Headache', 'Nausea', 'Abdominal discomfort', 'Vomiting', 'Fainting', 'Dizziness', 'Fatigue','Diarrhoea')"
+
+data2 <- dbGetQuery(con, sql_query2)
+
 # plotting
 plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = NULL, x = NULL, y = NULL) +
+     labs(title = "Messages covered under\nside effects (n=47)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
     scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
-print(plot)
+plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
+     geom_bar(stat = "identity", position = "dodge", color = "white") +
+     facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
+     labs(title = "Pre- and post- knowledge", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  # Remove x-axis text
+     geom_text(aes(label = scales::percent(value), group = attibutes),
+               position = position_dodge(width = 0.8),  
+               vjust = 0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
+  guides(fill = guide_legend(override.aes = list(title = NULL)))+
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+grid.arrange(plot, plot2, ncol = 2)
 ```
 
 /* figure 2 */
