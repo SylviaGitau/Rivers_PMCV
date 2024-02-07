@@ -2230,26 +2230,124 @@ grid.arrange(plot, plot2, ncol = 2)
     </tr>
     <tr>
       <td>Steps to be taken in cases of SAEs at LGA trainings</td>
-      <td>100%</td>
-      <td>88%</td>
+      ```{r steps_sae, results='asis'}
+      query_steps_sae <- "SELECT * FROM lga_obs
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND variable = 'Steps taken in case severe adverse events'
+                          AND Round IN ('Round 1', 'Round 2')"
+      steps_sae_data <- dbGetQuery(con, query_steps_sae)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(steps_sae_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(steps_sae_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>100%</td>
     </tr>
     <tr>
       <td>Steps to be taken in cases of SAEs at teacher trainings</td>
-      <td>94%</td>
-      <td>93%</td>
+      ```{r steps_sae2, results='asis'}
+      query_steps_sae2 <- "SELECT *,
+                                  CASE
+                                     WHEN attibutes = 'Not covered' THEN 1 - value
+                                     ELSE value
+                                  END AS value_new
+                                  FROM tt_obs
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND variable = 'Steps taken in case severe adverse events'
+                                  AND attibutes = 'Not covered'
+                                  AND Round IN ('Round 1', 'Round 2')"
+      steps_sae_data2 <- dbGetQuery(con, query_steps_sae2)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(steps_sae_data2$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(steps_sae_data2$value_new[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>86%</td>
     </tr>
     <tr>
       <td>Side effects in LGA trainings</td>
-      <td>100%</td>
-      <td>100%</td>
+      ```{r side-effects, results='asis'}
+      query_side_effects <- "SELECT year, state, round, variable,
+                             'SIDEFFECTS' AS attributes,
+                             SUM(CASE WHEN attibutes = 'Covered in Detail' THEN value ELSE 0 END) +
+                             SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+                             FROM lga_obs
+                             WHERE year = 2023
+                             AND state = 'Rivers'
+                             AND round IN ('Round 1', 'Round 2')
+                             AND variable = 'Information on side effects'
+                             AND attibutes IN ('Covered Partially', 'Covered in Detail')
+                             GROUP BY year, state, round, variable"
+      side_effects_data <- dbGetQuery(con, query_side_effects)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(side_effects_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(side_effects_data$total_sum[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>100%</td>
     </tr>
     <tr>
       <td>Side effects in teacher trainings</td>
-      <td>94%</td>
-      <td>100%</td>
+      ```{r side-effects2, results='asis'}
+      query_side_effects2 <- "SELECT year, state, round, variable,
+                             'SIDEFFECTS' AS attributes,
+                             SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
+                             SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
+                             FROM tt_obs
+                             WHERE year = 2022
+                             AND state = 'Rivers'
+                             AND round IN ('Round 1', 'Round 2')
+                             AND variable = 'Coverage of information on side effects'
+                             AND attibutes IN ('Covered Partially', 'Covered Completely')
+                             GROUP BY year, state, round, variable"
+      side_effects_data2 <- dbGetQuery(con, query_side_effects2)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(side_effects_data2$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(side_effects_data2$total_sum[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>89%</td>
     </tr>
     <tr>
@@ -2257,20 +2355,94 @@ grid.arrange(plot, plot2, ncol = 2)
     </tr>
     <tr>
       <td>LGA training attendees that could cite at least one side effect in post-training interviews</td>
-      <td>96%</td>
-      <td>100%</td>
+      ```{r one-effect, results='asis'}
+      query_one_effect <- "SELECT *,
+                                  CASE
+                                     WHEN attibutes = 'Don’t Know' THEN 1 - value
+                                     ELSE value
+                                  END AS value_new
+                                  FROM lga_prepost
+                                  WHERE year = 2022
+                                  AND sourcefile = 'POST'
+                                  AND state = 'Rivers'
+                                  AND variable = 'What are the mild side effects that are considered normal while treating for STH?'
+                                  AND attibutes = 'Don’t Know'
+                                  AND Round IN ('Round 1', 'Round 2')"
+      one_effect_data <- dbGetQuery(con, query_one_effect)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(one_effect_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(one_effect_data$value_new[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>100%</td>
     </tr>
     <tr>
       <td>Teacher training attendees that could cite at least one side effect in post-training interviews</td>
-      <td>96%</td>
-      <td>97%</td>
+      ```{r one-effect2, results='asis'}
+      query_one_effect2 <- "SELECT *,
+                                  CASE
+                                     WHEN attibutes = 'Don’t Know' THEN 1 - value
+                                     ELSE value
+                                  END AS value_new
+                                  FROM ttci_prepost
+                                  WHERE year = 2022
+                                  AND sourcefile = 'POST'
+                                  AND state = 'Rivers'
+                                  AND variable = 'What mild side effects are considered normal while treating for STH?'
+                                  AND attibutes = 'Don’t Know'
+                                  AND Round IN ('Round 1', 'Round 2')"
+      one_effect_data2 <- dbGetQuery(con, query_one_effect2)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(one_effect_data2$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(one_effect_data2$value_new[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>97%</td>
     </tr>
     <tr>
       <td>Teachers that reported having FLHF staff contact information in post-training interviews</td>
-      <td>79%</td>
-      <td>59%</td>
+      ```{r flhf-contact, results='asis'}
+      query_flhf_contact <- "SELECT * FROM ttci_prepost
+                            WHERE year = 2022
+                            AND variable = 'Do you have the contact details of the FLHF who will be supporting your school on Deworming Day?'
+                            AND state = 'Rivers'
+                            AND Round IN ('Round 1', 'Round 2')"
+      flhf_contact_data <- dbGetQuery(con, query_flhf_contact)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(flhf_contact_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(flhf_contact_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>62%</td>
     </tr>
     <tr>
@@ -2284,12 +2456,35 @@ grid.arrange(plot, plot2, ncol = 2)
     </tr>
     <tr>
       <td>FLHF staff mentioned the correct steps to take in case of SAE</td>
-      <td>29%</td>
-      <td>36%</td>
+       ```{r correct-steps, results='asis'}
+      query_correct_steps <- "SELECT * FROM dd_main
+                              WHERE year = 2022
+                              AND state = 'Rivers'
+                              AND round IN ('Round 1', 'Round 2')
+                              AND variable = 'school FLHFs who mentioned the correct steps to take in case of an SAE'"
+
+      correct_steps_data <- dbGetQuery(con, query_correct_steps)
+      
+      rounds <- c('Round 2', 'Round 1')
+      
+      for (i in 1:length(rounds)) {
+        round_name <- rounds[i]
+        index <- which(correct_steps_data$round == round_name)
+        cat("<td>")
+        if (length(index) > 0) {
+          cat(scales::percent(correct_steps_data$value[index]), " ")
+        } else {
+          cat("N/A ")
+        }
+        cat("</td>")
+      }
+      ```
       <td>40%</td>
     </tr>
   </tbody>
 </table>
+
+
 
 
 ```{r}
