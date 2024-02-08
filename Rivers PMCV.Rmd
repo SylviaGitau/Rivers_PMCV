@@ -468,7 +468,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
         if (length(index) > 0) {
           cat(scales::percent(enrolled_children_data$value[index]), " ")
         } else {
-          cat("N/A ")
+          cat("N/A")
         }
         cat("</td>")
       }
@@ -1157,7 +1157,7 @@ grid.arrange(plot, plot2, plot3, ncol=1)
 
 
 
-```{r figure6(ii), echo=FALSE, fig.width=8, fig.height=6 }
+```{r figure6(ii), echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
@@ -1372,6 +1372,7 @@ Raising awareness of the MDA within the target geographic area and population is
 library(ggplot2)
 library(gridExtra)
 library(stringr)
+library(patchwork)
 
 # sql query to get data (messages covered under community sensitization)
 sql_query <- "SELECT * FROM tt_obs
@@ -1424,7 +1425,7 @@ plot2 <- ggplot(data2, aes(x = attibutes, y = value, fill = attibutes)) +
      theme(axis.text.x = element_blank()) +  
     scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
-grid.arrange(plot, plot2, ncol = 2)
+print(plot|plot2)
 ```
 
 
@@ -1498,19 +1499,16 @@ The drug administration topic was covered in all (100%) LGA and teacher training
 
 .custom-table th {
   background-color: #fe6e87;
-  padding: 8px; /* Add padding specifically for the header cells */
 }
-
 </style>
 
 <!-- Table -->
-<table class="custom-table" style="empty-cells: show;">
+<table class="custom-table">
   <thead>
     <tr>
-      <th>MDA Practice</th>
-      <th>LGA training <br> (n=14)</th>
-      <th>Teacher training <br> (n=47)</th>
-      <th></th>
+      <th>MDA practice</th>
+      <th>LGA training (n=14)</th>
+      <th>Teacher training (n=47)</th>
     </tr>
   </thead>
   <tbody>
@@ -2135,7 +2133,7 @@ Side effects are potential outcomes of any treatment that may or may not be dire
 
 ##### **Figure 12: Messages shared about side effects, participants’ pre- and post-training knowledge and FLHF on deworming day** 
 
-```{r figure12, echo=FALSE, fig.height=6, fig.width = 8}
+```{r figure12, echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
@@ -2192,7 +2190,40 @@ plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
 grid.arrange(plot, plot2, ncol = 2)
 ```
 
-/* figure 2 */
+
+
+```{r figure12(ii), echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+#sql query to get data
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'ASK: What are side effects that would be considered normal while treating for STH with Albendazole?'
+AND attributes IN ('Headache', 'Nausea', 'Abdominal discomfort', 'Vomiting', 'Dizziness', 'Fatigue')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Use reorder to arrange bars based on value
+data$attributes <- reorder(data$attributes, data$value)
+
+# Plotting
+plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "FLHF knowledge of side effects on deworming day (n=14)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) 
+
+print(plot)
+```
 
 ##### **Table 5: Coverage and retention of knowledge of side effects in LGA and teacher trainings and on deworming day**
 
@@ -2485,9 +2516,681 @@ grid.arrange(plot, plot2, ncol = 2)
 </table>
 
 
+#### <span style="color:#fe6e87;">Training Logistics</span>
 
+/* figure */
 
-```{r}
+### <span style="color:#fe6e87;">4.2 Distribution of Drugs and Materials</span>
 
+```{r distribution-of-materials, echo = FALSE}
+
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('schools with all the key STH materials', 'schools with reporting forms present', 'OBSERVE: Please Select All Of The Materials, Forms, And Drugs Present At The Deworming Station:')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+
+value_percent <- data$value[data$variable == 'schools with all the key STH materials'] * 100
+
+value_percent2 <- data$value[data$variable == 'OBSERVE: Please Select All Of The Materials, Forms, And Drugs Present At The Deworming Station:'] * 100
+
+value_percent3 <- data$value[data$variable == 'schools with reporting forms present'] * 100
+
+renderText(sprintf(
+  "Trainers should receive key materials before training (drugs and reporting forms) to distribute to teachers as well as to aid in teacher training sessions. On deworming day, %.0f%% of schools had all required materials; all (%.0f%%) had drugs and %.0f%% had reporting forms. The cascade of these materials is shown in - Figure 14 below.",
+  value_percent,
+  value_percent2,
+  value_percent3
+))
 ```
 
+From post-deworming interviews with head teachers, 97% indicated the sufficiency of the initial drugs received.
+
+##### **Table 6: Post-deworming interview with head teachers (n=60)**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Percent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sufficient drugs available on deworming week</td>
+      ```{r sufficient_drug, results='asis'}
+      query_sufficient_drug <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND round = 'Overall'
+                          AND variable = 'ASK:Were deworming medicines sufficient for today?'"
+                          
+      sufficient_drug_data <- dbGetQuery(con, query_sufficient_drug)
+      
+      if (nrow(sufficient_drug_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(sufficient_drug_data)) {
+    cat("<td>")
+    if (!is.na(sufficient_drug_data$value[i])) {
+      cat(scales::percent(sufficient_drug_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+<tr>
+      <td>Surplus drugs left after deworming week</td>
+      ```{r surplus_drug, results='asis'}
+      query_surplus_drug <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'ASK:Do you have any extra tablets left after the deworming day?'"
+                          
+      surplus_drug_data <- dbGetQuery(con, query_surplus_drug)
+      
+      if (nrow(surplus_drug_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(surplus_drug_data)) {
+    cat("<td>")
+    if (!is.na(surplus_drug_data$value[i])) {
+      cat(scales::percent(surplus_drug_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+    <td>Plans for dealing with the surplus drugs after deworming  (n=50)</td>
+    <td></td>
+    </tr>
+     <tr>
+      <td>Keep for mop-up</td>
+      ```{r mop_up, results='asis'}
+      query_mop_up <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What will you do with these excess tablets after the DD?'
+                          AND attributes = 'Keep for mop-up'"
+                          
+      mop_up_data <- dbGetQuery(con, query_mop_up)
+      
+      if (nrow(mop_up_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(mop_up_data)) {
+    cat("<td>")
+    if (!is.na(mop_up_data$value[i])) {
+      cat(scales::percent(mop_up_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+<tr>
+      <td>Deworm junior secondary</td>
+      ```{r deworm_junior, results='asis'}
+      query_deworm_junior <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What will you do with these excess tablets after the DD?'
+                          AND attributes = 'Other:Deworm junior secondary'"
+                          
+      deworm_junior_data <- dbGetQuery(con, query_deworm_junior)
+      
+      if (nrow(deworm_junior_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(deworm_junior_data)) {
+    cat("<td>")
+    if (!is.na(deworm_junior_data$value[i])) {
+      cat(scales::percent(deworm_junior_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+      <td>Keep for next year</td>
+      ```{r next_year, results='asis'}
+      query_next_year <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What will you do with these excess tablets after the DD?'
+                          AND attributes = 'Keep for next year'"
+                          
+      next_year_data <- dbGetQuery(con, query_next_year)
+      
+      if (nrow(next_year_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(next_year_data)) {
+    cat("<td>")
+    if (!is.na(next_year_data$value[i])) {
+      cat(scales::percent(next_year_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+ <tr>
+      <td>Return to FLHF/LGA</td>
+      ```{r return_FLHF, results='asis'}
+      query_return_FLHF <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What will you do with these excess tablets after the DD?'
+                          AND attributes = 'Return to FLHF/LGA'"
+                          
+      return_FLHF_data <- dbGetQuery(con, query_return_FLHF)
+      
+      if (nrow(return_FLHF_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(return_FLHF_data)) {
+    cat("<td>")
+    if (!is.na(return_FLHF_data$value[i])) {
+      cat(scales::percent(return_FLHF_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+     </tbody>
+   </table>
+   
+### <span style="color:#fe6e87;">4.3 Community Sensitization</span>
+Community sensitization before deworming day is an evidence-supported factor critical for MDA success. On deworming day, monitors interviewed 168 parents (119 of enrolled children and 49 of non-enrolled children) to gauge their awareness of the MDA, as well as their sources of MDA information. **Table 7** shows statistics from these interviews.
+
+##### **Table 7: Demographic characteristics of households visited**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>Indicator</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Average number of children within the target age group per household</td>
+      <td>2</td>
+      </tr>
+      <tr>
+      <td colspan="4" class="left-align"><strong>Highest level of education</strong></td>
+      </tr>
+      <tr>
+        <td>Secondary school</td>
+      ```{r secondary_school, results='asis'}
+      query_secondary_school <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'Secondary school'"
+                          
+      secondary_school_data <- dbGetQuery(con, query_secondary_school)
+      
+      if (nrow(secondary_school_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(secondary_school_data)) {
+    cat("<td>")
+    if (!is.na(secondary_school_data$value[i])) {
+      cat(scales::percent(secondary_school_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+<tr>
+        <td>Primary school</td>
+      ```{r primary_school, results='asis'}
+      query_primary_school <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'Primary school'"
+                          
+      primary_school_data <- dbGetQuery(con, query_primary_school)
+      
+      if (nrow(primary_school_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(primary_school_data)) {
+    cat("<td>")
+    if (!is.na(primary_school_data$value[i])) {
+      cat(scales::percent(primary_school_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>University</td>
+      ```{r university, results='asis'}
+      query_university <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'University'"
+                          
+      university_data <- dbGetQuery(con, query_university)
+      
+      if (nrow(university_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(university_data)) {
+    cat("<td>")
+    if (!is.na(university_data$value[i])) {
+      cat(scales::percent(university_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Diploma</td>
+      ```{r diploma, results='asis'}
+      query_diploma <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'Diploma course'"
+                          
+      diploma_data <- dbGetQuery(con, query_diploma)
+      
+      if (nrow(diploma_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(diploma_data)) {
+    cat("<td>")
+    if (!is.na(diploma_data$value[i])) {
+      cat(scales::percent(diploma_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>No schooling</td>
+      ```{r no_schooling, results='asis'}
+      query_no_schooling <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'Diploma course'"
+                          
+      no_schooling_data <- dbGetQuery(con, query_no_schooling)
+      
+      if (nrow(no_schooling_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(no_schooling_data)) {
+    cat("<td>")
+    if (!is.na(no_schooling_data$value[i])) {
+      cat(scales::percent(no_schooling_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Certificate</td>
+      ```{r certificate, results='asis'}
+      query_certificate <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your highest level of education?'
+                          AND attributes = 'Certificate course'"
+                          
+      certificate_data <- dbGetQuery(con, query_certificate)
+      
+      if (nrow(certificate_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(certificate_data)) {
+    cat("<td>")
+    if (!is.na(certificate_data$value[i])) {
+      cat(scales::percent(certificate_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+      <td colspan="4" class="left-align"><strong>Occupation</strong></td>
+      </tr>
+      <tr>
+            <td>Business man / woman</td>
+      ```{r business, results='asis'}
+      query_business <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Business man/woman'"
+                          
+      business_data <- dbGetQuery(con, query_business)
+      
+      if (nrow(business_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(business_data)) {
+    cat("<td>")
+    if (!is.na(business_data$value[i])) {
+      cat(scales::percent(business_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Business man / woman</td>
+      ```{r farmer, results='asis'}
+      query_farmer <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Farmer'"
+                          
+      farmer_data <- dbGetQuery(con, query_farmer)
+      
+      if (nrow(farmer_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(farmer_data)) {
+    cat("<td>")
+    if (!is.na(farmer_data$value[i])) {
+      cat(scales::percent(farmer_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Casual labourer</td>
+      ```{r casual_laborer, results='asis'}
+      query_casual_laborer <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Casual labourer'"
+                          
+      casual_laborer_data <- dbGetQuery(con, query_casual_laborer)
+      
+      if (nrow(casual_laborer_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(casual_laborer_data)) {
+    cat("<td>")
+    if (!is.na(casual_laborer_data$value[i])) {
+      cat(scales::percent(casual_laborer_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Teacher</td>
+      ```{r teacher, results='asis'}
+      query_teacher <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Teacher'"
+                          
+      teacher_data <- dbGetQuery(con, query_teacher)
+      
+      if (nrow(teacher_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(teacher_data)) {
+    cat("<td>")
+    if (!is.na(teacher_data$value[i])) {
+      cat(scales::percent(teacher_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Civil / Public servant</td>
+      ```{r civil_servant , results='asis'}
+      query_civil_servant <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Civil/Public Servant'"
+                          
+      civil_servant_data <- dbGetQuery(con, query_civil_servant)
+      
+      if (nrow(civil_servant_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(civil_servant_data)) {
+    cat("<td>")
+    if (!is.na(civil_servant_data$value[i])) {
+      cat(scales::percent(civil_servant_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Artisan</td>
+      ```{r artisan , results='asis'}
+      query_artisan <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Artisan'"
+                          
+      artisan_data <- dbGetQuery(con, query_artisan)
+      
+      if (nrow(artisan_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(artisan_data)) {
+    cat("<td>")
+    if (!is.na(artisan_data$value[i])) {
+      cat(scales::percent(artisan_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Agriculture</td>
+      ```{r agriculture , results='asis'}
+      query_agriculture <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Agriculture'"
+                          
+      agriculture_data <- dbGetQuery(con, query_agriculture)
+      
+      if (nrow(agriculture_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(agriculture_data)) {
+    cat("<td>")
+    if (!is.na(agriculture_data$value[i])) {
+      cat(scales::percent(agriculture_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>Homemaker</td>
+      ```{r home_maker , results='asis'}
+      query_home_maker <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'Home maker'"
+                          
+      home_maker_data <- dbGetQuery(con, query_home_maker)
+      
+      if (nrow(home_maker_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(home_maker_data)) {
+    cat("<td>")
+    if (!is.na(home_maker_data$value[i])) {
+      cat(scales::percent(home_maker_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    <tr>
+            <td>None</td>
+      ```{r none , results='asis'}
+      query_none <- "SELECT * FROM cms
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'What is your primary Occupation?'
+                          AND attributes = 'None'"
+                          
+      none_data <- dbGetQuery(con, query_none)
+      
+      if (nrow(none_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(none_data)) {
+    cat("<td>")
+    if (!is.na(none_data$value[i])) {
+      cat(scales::percent(none_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+    </tr>
+    </tbody>
+   </table>
