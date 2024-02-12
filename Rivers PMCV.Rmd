@@ -1385,7 +1385,7 @@ AND attibutes IN ('Conduct Health Education on assembly ground', 'Display Poster
 data <- dbGetQuery(con, sql_query)
 
 # Use reorder to arrange bars from smallest to highest
-data$attibutes <- reorder(data$attibutes, data$value)
+data$attibutes <- reorder(data$attibutes, -data$value)
 
 # sql query to get data (Post-knowledge on sensitization roles)
 sql_query2 <- "SELECT * FROM ttci_prepost
@@ -2548,6 +2548,79 @@ renderText(sprintf(
 ))
 ```
 
+##### **Figure 14: Material distribution across the cascade**
+
+```{r figure14, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+library(patchwork)
+
+# sql query to get data (key materials)
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'schools with all the key STH materials'"
+
+data <- dbGetQuery(con, sql_query)
+
+# sql query to get data (key materials)
+sql_query2 <- "SELECT * FROM ttci_prepost
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Received all key materials for DD'"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# sql query to get data (key materials)
+sql_query3 <- "SELECT * FROM tt_admin
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'key materials distributed'"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# Plotting 1
+plot <- ggplot(data, aes(x = attributes, y = value)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Plotting 2
+plot2 <- ggplot(data2, aes(x = attibutes, y = value)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Plotting 3
+plot3 <- ggplot(data3, aes(x = attibutes, y = value)) +
+    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+    geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+              position = position_stack(vjust = 0.5), size = 3) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    coord_flip() +
+    theme_minimal() +
+    theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Arrange plots
+grid.arrange(plot, plot2, plot3, ncol = 1, left = "All KEY materials")
+```
+
 From post-deworming interviews with head teachers, 97% indicated the sufficiency of the initial drugs received.
 
 ##### **Table 6: Post-deworming interview with head teachers (n=60)**
@@ -3194,3 +3267,145 @@ Community sensitization before deworming day is an evidence-supported factor cri
     </tr>
     </tbody>
    </table>
+   
+#### <span style="color:#fe6e87;">Parents Deworming Knowledge</span>
+
+Seventy-three percent (73%) of parents interviewed on deworming day (down from 82% last year) were aware of deworming happening within their communities, with this proportion being higher among parents of enrolled children (86%) compared to parents of non-enrolled children (43%, Figure 15). Overall awareness was at 77% (90% parents of enrolled children and 41% parents of non-enrolled) in round two, which is 7 percentage points higher than in round one (81% parents of enrolled children and 44% parents of non-enrolled).
+
+##### **Figure 15: Awareness among parents of enrolled and non-enrolled children**
+ /*figure 15*/
+
+Monitors further asked parents questions about their knowledge of the deworming date, target age group, and what the treatment was for. The results are summarized in - **Figure 16**.
+
+##### **Figure 16: Parent knowledge of key information**
+
+```{r figure16, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+library(patchwork)
+
+# sql query to get data 
+sql_query <- "SELECT * FROM cms
+              WHERE year = 2022
+              AND round = 'Overall'
+              AND state = 'Rivers'
+              AND variable IN ('Which worms are children being treated for in today’s deworming?(non-enrolled)','Which worms are children being treated for in today’s deworming?(enrolled)',
+'Which worms are children being treated for in today’s deworming?')
+              AND attributes = 'Intestinal worms/STH'"
+
+data <- dbGetQuery(con, sql_query)
+
+# sql query to get data 
+sql_query2 <- "SELECT * FROM cms
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable IN ('What is the age group eligible to be treated for STH under the program?(non-enrolled)','What is the age group eligible to be treated for STH under the program?(enrolled)',
+'What is the age group eligible to be treated for STH under the program?')
+AND attributes = '5-14 Years'"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# sql query to get data 
+sql_query3 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Proportion of parents who were aware of deworming activity at school'
+AND (attributes IS NULL OR attributes IN ('Enrolled children', 'Non-enrolled children'))"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+#plotting 1
+plot <- ggplot(data, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Knew treatment\nwas for worms", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959"))
+
+#plotting 2
+plot2 <- ggplot(data2, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Target age-group", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959"))
+
+#plotting 3
+plot3 <- ggplot(data3, aes(x = attributes, y = value, fill = attributes)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Deworming date", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959"))
+
+# Arrange plots
+print(plot/plot2/plot3)
+```
+
+During community interviews with parents on deworming day, 21% of parents (20% of enrolled and 24% of non-enrolled) indicated that they had concerns or questions about the deworming activity. The concerns included sensitization on worm infection and prevention (11%), the safety of the deworming medicine (8%), involving parents in the program’s training (6%), the program’s continuation (6%), and the need for early awareness (3%); questions included why adults are not being dewormed (39%), how long the program will last (6%), who is providing the deworming medicine - the government or the health facility (6%), whether the deworming medicine is provided for free (6%), whether deworming is only done in schools (3%) and why non-enrolled children are not getting deworming messages (3%).
+
+
+#### <span style="color:#fe6e87;">Sources of Deworming Day Information</span>
+The majority of the parents heard about deworming from either their child (74%) or a teacher (40%). Most parents prefer getting deworming information from the town announcer (49%), radio (45%), teachers (42%), and children (38%) - **Figure 17**.
+
+##### **Figure 17: Sources of deworming day information cited by parents**
+
+/*figure17*/
+
+#### <span style="color:#fe6e87;">Parents’ Reasons for Not Sending Children for Deworming</span>
+
+Seventy-three percent (73%) of parents around school were aware of deworming, and 76% of these parents indicated that they would send at least one of their children for deworming. The reasons for not sending children for deworming can be found in - Figure 18.
+
+##### **Figure 18: Reasons cited by parents (n=40) for not sending children for deworming**
+
+```{r figure18, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+
+sql_query <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Why will/did your children NOT get deworming medicine today?'"
+
+data <- dbGetQuery(con, sql_query)
+
+# Use reorder to arrange bars based on value
+data$attributes <- reorder(data$attributes, data$value)
+
+# plotting
+plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title =NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+print(plot)
+
+```
+
+
+
+
