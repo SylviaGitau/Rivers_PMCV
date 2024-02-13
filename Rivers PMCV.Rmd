@@ -3370,7 +3370,31 @@ The majority of the parents heard about deworming from either their child (74%) 
 
 #### <span style="color:#fe6e87;">Parents’ Reasons for Not Sending Children for Deworming</span>
 
-Seventy-three percent (73%) of parents around school were aware of deworming, and 76% of these parents indicated that they would send at least one of their children for deworming. The reasons for not sending children for deworming can be found in - Figure 18.
+```{r reason-not-sending, echo = FALSE}
+
+sql_query <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Proportion of parents who were aware of deworming activity at school'
+AND attributes IS NULL"
+
+data <- dbGetQuery(con, sql_query)
+
+# Calculate the percentage and display the text
+value_percent <- data$value[data$variable == 'Proportion of parents who were aware of deworming activity at school'] * 100
+
+# Calculate the number of rows
+n_rows <- nrow(data)
+
+output_text <- sprintf(
+  "%.0f%% of parents around school were aware of deworming, and 76% of these parents indicated that they would send at least one of their children for deworming. The reasons for not sending children for deworming can be found in - Figure 18.",
+  value_percent,
+  n_rows
+)
+
+renderText(output_text)
+```
 
 ##### **Figure 18: Reasons cited by parents (n=40) for not sending children for deworming**
 
@@ -3403,9 +3427,362 @@ plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
     scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 print(plot)
-
 ```
 
+#### <span style="color:#fe6e87;">FLHF Interview</span>
+
+After speaking with parents in the community surrounding schools, the monitors also spoke with the FLHF in the community. Below - **Figure 19**, shows the results of this interview on their knowledge of deworming day.
+
+##### **Figure 19: FLHF knowledge regarding the deworming activity (n=28)**
+
+```{r figure 19, echo=FALSE, out.width='100%', fig.height=6, fig.width = 8}
+
+library(ggplot2)
+library(gridExtra)
+library(patchwork)
+library(stringr)
+
+# SQL query to get data
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'ASK:Did you attend any FLHF forum session on deworming in the past 15 days?'"
+
+data <- dbGetQuery(con, sql_query)
+
+# SQL query to get data
+sql_query2 <- "SELECT *
+FROM dd_main
+WHERE year = 2022
+  AND round = 'Overall'
+  AND state = 'Rivers'
+  AND variable = 'ASK: What are your responsibilities as a FLHF in the School-based Deworming Program?'
+  AND attributes NOT IN ('Other: summit drugs to the schools assigned', 'Other: inform chief of deworming activity')"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Use reorder to arrange bars from smallest to highest
+data2$attributes <- reorder(data2$attributes, data2$value)
+
+# SQL query to get data
+sql_query3 <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'ASK: Which materials were provided to you by the deworming program for community sensitization?'
+AND attributes NOT IN ('Other:Drugs')"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# Use reorder to arrange bars from smallest to highest
+data3$attributes <- reorder(data3$attributes, data3$value)
+
+# SQL query to get data
+sql_query4 <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable = 'ASK: What activities have you conducted for the deworming day to sensitize the community around the school?'
+AND attributes NOT IN ('Other:Drugs', 'Other:To check', 'Other:Training')"
+
+data4 <- dbGetQuery(con, sql_query4)
+
+# Use reorder to arrange bars from smallest to highest
+data4$attributes <- reorder(data4$attributes, data4$value)
+
+# Plotting 1
+plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="Did you attend any FLHF forum session on\ndeworming in the past 15 days?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) 
+
+# Plotting 2
+plot2 <- ggplot(data2, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="What are your responsibilities as a FLHF in the\nSchool-based Deworming Program (SBDP)?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) 
+
+# Plotting 3
+plot3 <- ggplot(data3, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="Which materials were provided to you by the deworming\nprogram for community sensitization?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank())
+
+# Plotting 4
+plot4 <- ggplot(data4, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="What activities have you conducted to sensitize\nthe community around the school?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank())
+
+print(plot/plot2/plot3/plot4)
+```
+
+### <span style="color:#fe6e87;">4.4 Deworming Week</span>
+
+Ninety-seven percent (97% - for both round one and round two) of head teachers interviewed on deworming day indicated that either they (70% - for both round one and round two) or another teacher at the school (27% - in both round one and round two) had attended a training session in preparation for deworming day within 30 days of the MDA. A follow-up interview with a member of the deworming team also revealed that all (100%) of them had either attended the training or been sensitized within the school on how to administer deworming drugs. 
+
+#### <span style="color:#fe6e87;">Deworming Week Delivery</span>
+
+Of the 60 schools that were originally sampled for deworming day monitoring, 13 schools were replaced due to various challenges:  five could not be located or accessed; four were not aware of deworming; two were not deworming; one had rescheduled deworming; and one had closed down. Of the originally sampled schools that were in session, could be located, and had parental consent for deworming, 47 out of 54 conducted deworming on the designated day, for a rate of 87%, an increase from 60% from the previous year of deworming. All 13 of the schools that were not monitored due to the above reasons were replaced and monitored, bringing the total to 60.
+
+#### <span style="color:#fe6e87;">Adherence to MDA Procedures</span>
+
+To provide quality assurance of the MDA administration, monitors observed whether deworming teams adhered to key drug administration steps. Results show high levels of compliance with the recommended practices - **Table 8**. However, the proportion of teachers who ensured that children washed their hands before treatment stood at 37%, this remained the same as that recorded in year 5, 2021. 
+
+##### **Table 8: MDA procedures observed by monitors during drug administration (n=60)**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>MDA practice</th>
+      <th>Percent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="4" class="left-align"><strong>**Pre-deworming preparations**</strong></td>
+      </tr>
+      <tr>
+        <td>Teachers ensured children washed their hands before treatment</td>
+      ```{r washing_hands, results='asis'}
+      query_washing_hands <- "SELECT * FROM dd_main
+                          WHERE year = 2022
+                          AND state = 'Rivers'
+                          AND round = 'Overall'
+                          AND variable = 'DD protocols'
+                          AND attributes = 'Hand washing by children'"
+                          
+      washing_hands_data <- dbGetQuery(con, query_washing_hands)
+      
+      if (nrow(washing_hands_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(washing_hands_data)) {
+    cat("<td>")
+    if (!is.na(washing_hands_data$value[i])) {
+      cat(scales::percent(washing_hands_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+<tr>
+        <td>Health education messages were shared with children before treatment</td>
+      ```{r education_messages, results='asis'}
+      query_education_messages <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'DD protocols'	
+                                 AND attributes = 'Health Mesages shared'"
+                          
+      education_messages_data <- dbGetQuery(con, query_education_messages)
+      
+      if (nrow(education_messages_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(education_messages_data)) {
+    cat("<td>")
+    if (!is.na(education_messages_data$value[i])) {
+      cat(scales::percent(education_messages_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+<tr>
+        <td>Deworming team comprised of two or more teachers</td>
+      ```{r deworming_team, results='asis'}
+      query_deworming_team <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'DD protocols'	
+                                 AND attributes = 'Dewoming team is more than 2 teachers'"
+                          
+      deworming_team_data <- dbGetQuery(con, query_deworming_team)
+      
+      if (nrow(deworming_team_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(deworming_team_data)) {
+    cat("<td>")
+    if (!is.na(deworming_team_data$value[i])) {
+      cat(scales::percent(deworming_team_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+<tr>
+      <td colspan="4" class="left-align"><strong>**Drug administration**</strong></td>
+      </tr>
+      <tr>
+        <td>Teachers gave the correct dosage for mebendazole (1 tablet)</td>
+      ```{r correct_dosage, results='asis'}
+      query_correct_dosage <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'Tabs and dosage protocol'	
+                                 AND attributes = 'Children chewed MEB'"
+                          
+      correct_dosage_data <- dbGetQuery(con, query_correct_dosage)
+      
+      if (nrow(correct_dosage_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(correct_dosage_data)) {
+    cat("<td>")
+    if (!is.na(correct_dosage_data$value[i])) {
+      cat(scales::percent(correct_dosage_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+<tr>
+        <td>Spoilt tablets were properly disposed of (n=9)</td>
+      ```{r properly_disposed, results='asis'}
+      query_properly_disposed <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'Tabs and dosage protocol'	
+                                 AND attributes = 'Properly disposed spoilt tablets'"
+                          
+      properly_disposed_data <- dbGetQuery(con, query_properly_disposed)
+      
+      if (nrow(properly_disposed_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(properly_disposed_data)) {
+    cat("<td>")
+    if (!is.na(properly_disposed_data$value[i])) {
+      cat(scales::percent(properly_disposed_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+<tr>
+      <td colspan="4" class="left-align"><strong>**Recording treatment**</strong></td>
+      </tr>
+      <tr>
+        <td>The treatment register was used to record treatment</td>
+      ```{r treatment_register, results='asis'}
+      query_treatment_register <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'DD protocols'	
+                                 AND attributes = 'Treatment register used'"
+                          
+      treatment_register_data <- dbGetQuery(con, query_treatment_register)
+      
+      if (nrow(treatment_register_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(treatment_register_data)) {
+    cat("<td>")
+    if (!is.na(treatment_register_data$value[i])) {
+      cat(scales::percent(treatment_register_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+ <tr>
+        <td>The teacher transferred the names from the class register to treatment register before the deworming exercise</td>
+      ```{r transferred_names, results='asis'}
+      query_transferred_names <- "SELECT * FROM dd_main
+                                 WHERE year = 2022
+                                 AND state = 'Rivers'
+                                 AND round = 'Overall'
+                                 AND variable = 'DD protocols'	
+                                 AND attributes = 'Trnsferred names prior'"
+                          
+      transferred_names_data <- dbGetQuery(con, query_transferred_names)
+      
+      if (nrow(transferred_names_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(transferred_names_data)) {
+    cat("<td>")
+    if (!is.na(transferred_names_data$value[i])) {
+      cat(scales::percent(transferred_names_data$value[i]))
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+</tr>
+ </tbody>
+</table>
+
+#### <span style="color:#fe6e87;">Management of Side Effects</span>
+
+In the sample of schools where monitors observed and collected data on deworming day for each round, there were 3 cases of mild side effects reported – fever (1 - all in round two), headache (1 - all in round one), and vomiting (1 - all in round two). There were no SAE cases reported. 
+
+#### <span style="color:#fe6e87;">School Coverage of Eligible and Non-Enrolled Children</span>
+
+At 35 out of 60 (58%) monitored schools, every eligible child enrolled at the school was treated. At twenty-five schools at least one eligible child was not treated due to factors such as parental refusal (16), child’s refusal (12), fear of drugs (4), a sick child (4), a child’s absence from school (2) or a child who had already been dewormed (2). While 93% of head teachers indicated that they had made plans to deworm non-enrolled children on deworming day, only 12% of the observed schools dewormed non-enrolled children, which is a 2 percentage points increase from 2021. The main reason cited by head teachers for not planning to deworm non-enrolled children will not come for deworming (50%) - Figure 20.
 
 
 
