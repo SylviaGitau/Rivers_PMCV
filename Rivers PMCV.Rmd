@@ -422,9 +422,10 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     <td>Community members who report seeing or hearing about deworming through IEC deworming materials or word of mouth this year</td>
       ```{r hearing-deworming, results='asis'}
       query_hearing_deworming <- "SELECT round, value FROM cms
-                                  WHERE year = 2023
+                                  WHERE year = 2022
                                   AND state = 'Rivers'
                                   AND variable = 'Proportion of parents who were aware of deworming activity at school'
+                                  AND attributes IS NULL
                                   AND Round IN ('Round 1', 'Round 2', 'Overall')"
       hearing_deworming_data <- dbGetQuery(con, query_hearing_deworming)
       
@@ -616,8 +617,8 @@ A few weeks after the round one MDA, monitors conducted coverage validation to d
   border-collapse: collapse;
 }
 
-.custom-table td,
-.custom-table th {
+.custom-table th,
+.custom-table td {
   border: 1px solid #000;
   padding: 8px;
   text-align: center;
@@ -626,50 +627,284 @@ A few weeks after the round one MDA, monitors conducted coverage validation to d
 .custom-table th {
   background-color: #fe6e87;
 }
-
-.gray-row th {
-  background-color: #C0C0C0;
-  border: none;
-}
-
-.green-row th {
-  background-color: #C0C0C0;
-  border: none;
-}
-
-.green-row td {
-  border-left: none;
-  border-right: none;
-}
-
-.green-row td:first-child {
-  border-left: 1px solid #000;
-}
 </style>
 
-<!-- Your Table -->
-<div class="custom-table">
-  | Monitoring activity                           | Target sample size | Actual sample size |
-  |-----------------------------------------------|--------------------|--------------------|
-  | LGA and teacher training                      |                    |                    |
-  | LGA training sessions                         | 14                 | 14                 |
-  | Pre-training LGA interviews                   | 56                 | 51                 |
-  | Post-training LGA interviews                  | 56                 | 56                 |
-  | Teacher training sessions                     | 48                 | 47                 |
-  | Pre-training teacher interviews               | 192                | 184                |
-  | Post-training teacher interviews              | 192                | 182                |
-  | Post-training LGA FLHF staff interviews       | 42                 | 25<sup>8</sup>                 |
-  | Deworming day interviews                      |                    |                    |
-  | Schools targeted for monitoring on deworming day | 60               | 60                 |
-  | Parents of non-enrolled children interviewed on deworming day | 60 | 49<sup>9</sup>         |
-  | Parents of enrolled children interviewed on deworming day | 120         | 119        |
-  | Enrolled children interviewed                 | 120                | 118                |
-  | Head teachers interviewed                     | 60                 | 60                 |
-  | Teachers interviewed                          | 60                 | 60                 |
-  | FLHF staff interviewed                        | 60                 | 28<sup>10</sup>   |
-  | Coverage validation                           |                    |                    |
-  | Number of children interviewed                | 2,357              | 2,372<sup>11</sup>|
-</div>
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>Monitoring activity</th>
+      <th>Target sample size</th>
+      <th>Actual sample size</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+      <td colspan="4" class="left-align"><strong>**LGA and teacher training**</strong></td>
+      </tr>
+  <tr>
+  <td>LGA training sessions</td>
+  <td>14</td>
+  <td>14</td>
+    </tr>
+  <tr>
+  <td>Pre-training LGA interviews</td>
+  <td>56</td>
+  ```{r pre_training_lga, results='asis'}
+      query_pre_training_lga <- "SELECT * FROM lga_prepost
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND sourcefile = 'PRE'
+                                  AND variable = 'Sample size';"
+                          
+      pre_training_lga_data <- dbGetQuery(con, query_pre_training_lga)
+      
+      if (nrow(pre_training_lga_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(pre_training_lga_data)) {
+    cat("<td>")
+    if (!is.na(pre_training_lga_data$attibutes[i])) {
+      cat(pre_training_lga_data$attibutes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+    <tr>
+  <td>Post-training LGA interviews</td>
+  <td>56</td>
+  ```{r post_training_lga, results='asis'}
+      query_post_training_lga <- "SELECT * FROM lga_prepost
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND sourcefile = 'POST'
+                                  AND variable = 'Sample size';"
+                          
+      post_training_lga_data <- dbGetQuery(con, query_post_training_lga)
+      
+      if (nrow(post_training_lga_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(post_training_lga_data)) {
+    cat("<td>")
+    if (!is.na(post_training_lga_data$attibutes[i])) {
+      cat(post_training_lga_data$attibutes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Teacher training sessions</td>
+  <td>48</td>
+  ```{r tt_training, results='asis'}
+      query_tt_training <- "SELECT * FROM tt_obs
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample size';"
+                          
+      tt_training_data <- dbGetQuery(con, query_tt_training)
+      
+      if (nrow(tt_training_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(tt_training_data)) {
+    cat("<td>")
+    if (!is.na(tt_training_data$attibutes[i])) {
+      cat(tt_training_data$attibutes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Pre-training teacher interviews</td>
+  <td>192</td>
+  ```{r pre_training_tt, results='asis'}
+      query_pre_training_tt <- "SELECT * FROM ttci_prepost
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND sourcefile = 'PRE'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample size'"
+                          
+      pre_training_tt_data <- dbGetQuery(con, query_pre_training_tt)
+      
+      if (nrow(pre_training_tt_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(pre_training_tt_data)) {
+    cat("<td>")
+    if (!is.na(pre_training_tt_data$attibutes[i])) {
+      cat(pre_training_tt_data$attibutes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Post-training teacher interviews</td>
+  <td>192</td>
+  ```{r post_training_tt, results='asis'}
+      query_post_training_tt <- "SELECT * FROM ttci_prepost
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND sourcefile = 'PRE'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample size'"
+                          
+      post_training_tt_data <- dbGetQuery(con, query_post_training_tt)
+      
+      if (nrow(post_training_tt_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(post_training_tt_data)) {
+    cat("<td>")
+    if (!is.na(post_training_tt_data$attibutes[i])) {
+      cat(post_training_tt_data$attibutes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Post-training LGA FLHF staff interviews</td>
+  <td>42</td>
+  <td>25<sup>8</sup></td>
+  </tr>
+  <tr>
+      <td colspan="4" class="left-align"><strong>**Deworming day interviews**</strong></td>
+      </tr>
+      <tr>
+  <td>Schools targeted for monitoring on deworming day</td>
+  <td>60</td>
+  ```{r schools_targeted, results='asis'}
+      query_schools_targeted <- "SELECT * FROM dd_main
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample Size'"
+                          
+      schools_targeted_data <- dbGetQuery(con, query_schools_targeted)
+      
+      if (nrow(schools_targeted_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(schools_targeted_data)) {
+    cat("<td>")
+    if (!is.na(schools_targeted_data$attributes[i])) {
+      cat(schools_targeted_data$attributes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Parents of non-enrolled children interviewed on deworming day</td>
+  <td>60</td>
+  <td>49<sup>9</sup></td>
+  </tr>
+  <tr>
+  <td>Parents of enrolled children interviewed on deworming day</td>
+  <td>120</td>
+  <td>119</td>
+  </tr>
+    <tr>
+  <td>Enrolled children interviewed</td>
+  <td>120</td>
+  <td>118</td>
+  </tr>
+  <tr>
+  <td>Head teachers interviewed</td>
+  <td>60</td>
+  ```{r head_teachers, results='asis'}
+      query_head_teachers <- "SELECT * FROM dd_main
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample Size'"
+                          
+      head_teachers_data <- dbGetQuery(con, query_head_teachers)
+      
+      if (nrow(head_teachers_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(head_teachers_data)) {
+    cat("<td>")
+    if (!is.na(head_teachers_data$attributes[i])) {
+      cat(head_teachers_data$attributes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>Teachers interviewed</td>
+  <td>60</td>
+  ```{r teacher_interviewed, results='asis'}
+      query_teacher_interviewed <- "SELECT * FROM dd_main
+                                  WHERE year = 2022
+                                  AND state = 'Rivers'
+                                  AND round = 'Overall'
+                                  AND variable = 'Sample Size'"
+                          
+      teacher_interviewed_data <- dbGetQuery(con, query_teacher_interviewed)
+      
+      if (nrow(teacher_interviewed_data) == 0) {
+  cat("<td>N/A</td>")
+} else {
+  for (i in 1:nrow(teacher_interviewed_data)) {
+    cat("<td>")
+    if (!is.na(teacher_interviewed_data$attributes[i])) {
+      cat(teacher_interviewed_data$attributes[i])
+    } else {
+      cat("N/A")
+    }
+    cat("</td>")
+  }
+}
+```
+  </tr>
+  <tr>
+  <td>FLHF staff interviewed</td>
+  <td>60</td>
+  <td>28<sup>10</sup></td>
+  </tr>
+  <tr>
+      <td colspan="4" class="left-align"><strong>**Coverage validation**</strong></td>
+      </tr>
+      <tr>
+  <td>Number of children interviewed</td>
+  <td>2357</td>
+  <td>2372<sup>11</sup></td>
+  </tr>
+  </tbody>
+</table>
 
 ## <span style="color:#fe6e87;">4.0 Process Monitoring Results</span>
 
@@ -1385,7 +1620,7 @@ AND attibutes IN ('Conduct Health Education on assembly ground', 'Display Poster
 data <- dbGetQuery(con, sql_query)
 
 # Use reorder to arrange bars from smallest to highest
-data$attibutes <- reorder(data$attibutes, -data$value)
+data$attibutes <- reorder(data$attibutes, data$value)
 
 # sql query to get data (Post-knowledge on sensitization roles)
 sql_query2 <- "SELECT * FROM ttci_prepost
@@ -3362,11 +3597,269 @@ During community interviews with parents on deworming day, 21% of parents (20% o
 
 
 #### <span style="color:#fe6e87;">Sources of Deworming Day Information</span>
-The majority of the parents heard about deworming from either their child (74%) or a teacher (40%). Most parents prefer getting deworming information from the town announcer (49%), radio (45%), teachers (42%), and children (38%) - **Figure 17**.
+
+```{r sources_dd, echo = FALSE}
+
+# get data1
+sql_query <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'ASK: How did you hear about the deworming exercise to be conducted in your community?'
+AND attributes  IN ('My child told me', 'Teacher from a local school')"
+ 
+data <- dbGetQuery(con, sql_query)
+
+# get data2
+sql_query2 <- "SELECT * FROM cms
+WHERE year = 2022
+AND round = 'Overall'
+AND state = 'Rivers'
+AND variable ='What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?'
+AND attributes IN ('Town announcer','Radio','Teachers','School Children')"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Calculate the percentage and display the text
+
+value_percent <- data$value[data$variable == 'ASK: How did you hear about the deworming exercise to be conducted in your community?' &  data$attributes == 'My child told me'] * 100
+
+value_percent2 <- data$value[data$variable == 'ASK: How did you hear about the deworming exercise to be conducted in your community?' & data$attributes == 'Teacher from a local school'] * 100
+
+value_percent3 <- data2$value[data2$variable == 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?' & data2$attributes == 'Town announcer'] * 100
+
+value_percent4 <- data2$value[data2$variable == 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?' & data2$attributes == 'Radio'] * 100
+
+value_percent5 <- data2$value[data2$variable == 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?' & data2$attributes == 'Teachers'] * 100
+
+value_percent6 <- data2$value[data2$variable == 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?' & data2$attributes == 'School Children'] * 100
+
+# Calculate the number of rows
+n_rows <- nrow(data)
+
+output_source <- (sprintf(
+  "The majority of the parents heard about deworming from either their child (%.0f%%) or a teacher (%.0f%%). Most parents prefer getting deworming information from the town announcer (%.0f%%), radio (%.0f%%), teachers (%.0f%%), and children (%.0f%%) - Figure 17.",
+  value_percent,
+  value_percent2,
+  value_percent3,
+  value_percent4,
+  value_percent5,
+  value_percent6,
+  n_rows
+))
+renderText(output_source)
+```
 
 ##### **Figure 17: Sources of deworming day information cited by parents**
 
-/*figure17*/
+```{r figure17, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+library(patchwork)
+
+# sql query to get data
+sql_query <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes IN ('School Children', 'My child told me')"
+
+data <-  dbGetQuery(con, sql_query)
+
+# sql query to get data
+sql_query2 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes IN ('Teacher from a local school', 'Teachers')"
+
+data2 <-  dbGetQuery(con, sql_query2)
+
+# sql query to get data
+sql_query3 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes = 'Poster'"
+
+data3 <-  dbGetQuery(con, sql_query3)
+
+# sql query to get data
+sql_query4 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes IN ('Town announcer', 'Town Announcer')"
+
+data4 <-  dbGetQuery(con, sql_query4)
+
+# sql query to get data
+sql_query5 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes = 'Radio'"
+
+data5 <-  dbGetQuery(con, sql_query5)
+
+# sql query to get data
+sql_query6 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable IN ('ASK: How did you hear about the deworming exercise to be conducted in your community?', 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?')
+AND attributes IN('It was announced in religious centres','Other:Religious gathering')"
+
+data6 <-  dbGetQuery(con, sql_query6)
+
+# sql query to get data
+sql_query7 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?'
+AND attributes = 'SMS/Mobile Phone'"
+
+data7 <-  dbGetQuery(con, sql_query7)
+
+# sql query to get data
+sql_query8 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?'
+AND attributes = 'Town Hall Meeting'"
+
+data8 <-  dbGetQuery(con, sql_query8)
+
+# sql query to get data
+sql_query9 <- "SELECT * FROM cms
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'What are your top three most preferred methods of communication to get information about future deworming activity in the nearby school?'
+AND attributes = 'Village elders'"
+
+data9 <-  dbGetQuery(con, sql_query9)
+
+#plotting 1
+plot <- ggplot(data, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Children", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 2
+plot2 <- ggplot(data2, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Teacher", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 3
+plot3 <- ggplot(data3, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Poster", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 4
+plot4 <- ggplot(data4, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Town\nannouncer", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 5
+plot5 <- ggplot(data5, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Radio", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 6
+plot6 <- ggplot(data6, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Religious\ncentre", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#fe6e87", "#c5c6c7"))
+
+#plotting 7
+plot7 <- ggplot(data7, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Mobile\nPhone", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#c5c6c7"))
+
+#plotting 8
+plot8 <- ggplot(data8, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Town\nHall\nMeeting", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#c5c6c7"))
+
+#plotting 9
+plot9 <- ggplot(data9, aes(x = variable, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white", width = 1) +
+  geom_text(aes(label = scales::percent(value)), 
+            position = position_dodge(width = 0.8), 
+            hjust = -0.2, size = 3) +
+  labs(title = NULL, x = "Village\nelders", y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "none") +
+  scale_fill_manual(values = c("#c5c6c7"))
+
+print(plot/plot2/plot3/plot4/plot5/plot6/plot7/plot8/plot9)
+```
+
 
 #### <span style="color:#fe6e87;">Parents’ Reasons for Not Sending Children for Deworming</span>
 
@@ -3783,6 +4276,381 @@ In the sample of schools where monitors observed and collected data on deworming
 #### <span style="color:#fe6e87;">School Coverage of Eligible and Non-Enrolled Children</span>
 
 At 35 out of 60 (58%) monitored schools, every eligible child enrolled at the school was treated. At twenty-five schools at least one eligible child was not treated due to factors such as parental refusal (16), child’s refusal (12), fear of drugs (4), a sick child (4), a child’s absence from school (2) or a child who had already been dewormed (2). While 93% of head teachers indicated that they had made plans to deworm non-enrolled children on deworming day, only 12% of the observed schools dewormed non-enrolled children, which is a 2 percentage points increase from 2021. The main reason cited by head teachers for not planning to deworm non-enrolled children will not come for deworming (50%) - Figure 20.
+
+##### **Figure 20: Coverage of eligible and non-enrolled children on deworming day (n=60)**
+
+```{r figure 20, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(patchwork)
+library(stringr)
+
+# SQL query to get data
+sql_query <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Why were eligible children not dewormed today?'
+AND attributes NOT IN ('Other:Children absent from school', 'Other:Children that already taken deworming medicine')"
+
+data <- dbGetQuery(con, sql_query)
+
+# Mapping original variable names to desired names
+variable_mapping <- c('Other:Sick children' = 'Child sick',
+                      'Refusal by Children'='Refusal by Children',
+                      'Parent refused'='Parent refused',
+                      'Fear drugs'='Fear drugs')
+
+# Apply the mapping to the 'variable' column in data_lga
+data$variable_mapped <- variable_mapping[data$attributes]
+
+# Use reorder to arrange bars from smallest to highest
+data$variable_mapped <- reorder(data$variable_mapped, data$value)
+
+# SQL query to get data
+sql_query2 <- "SELECT * FROM dd_main
+WHERE year = 2022
+AND state = 'Rivers'
+AND round = 'Overall'
+AND variable = 'Were absentees noted for possible treatment when they return?'"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# Use reorder to arrange bars from smallest to highest
+data2$attributes <- reorder(data2$attributes, data2$value)
+
+sql_query3 <- "SELECT * FROM dd_main
+               WHERE year = 2022
+               AND state = 'Rivers'
+               AND round = 'Overall'
+               AND variable = 'Tabs and dosage protocol'
+               AND attributes = 'Coerced to swallow'"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# 'value' column contains the percentage obtained from the database
+value_from_db <- data3$value
+
+# Calculate the complementary value
+complementary_value <- 1 - value_from_db  
+
+# Create a data frame with both values and labels
+plot_data <- data.frame(
+  attributes = c("Yes", "No"),  # Assign labels "Yes" and "No"
+  value = c(value_from_db, complementary_value))
+
+# Plotting 1
+plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="Why were eligible children not dewormed today?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank())
+
+# Plotting 2
+plot2 <- ggplot(data2, aes(x = attributes, y = value, fill = attributes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title ="Were absentees noted for possible treatment when they return?", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) 
+
+# Plotting 3
+plot3 <- ggplot(plot_data, aes(x = reorder(attributes, value), y = value, fill = attributes)) +
+  geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+  geom_text(aes(label = scales::percent(value), y = value), 
+            position = position_stack(vjust = 0.5), size = 3) + 
+  labs(title ="Were any children coerced to swallow the medicine against their wishes?", x = NULL, y = NULL) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.x = element_blank())
+
+print(plot/plot2/plot3)
+```
+
+## <span style="color:#fe6e87;">5.0 Coverage Validation Results</span>
+
+Coverage validation surveys were administered within six weeks of the MDA in two randomly selected LGAs – Emohua and Opobo/Nkoro. Coverage validation intended to achieve the following main objectives:
+
+1.	To validate the reported coverage numbers as reported by teachers and aggregated to the LGA level
+
+2.	To identify reasons for non-compliance
+
+### <span style="color:#fe6e87;">5.1 STH Results</span>
+
+##### **Table 9: Coverage Validation Survey Results**
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.custom-table td,
+.custom-table th {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+
+.custom-table .bold-row th {
+  font-weight: bold;
+}
+
+.custom-table .border-left th,
+.custom-table .border-left td {
+  border-left: 1px solid #000;
+}
+
+.custom-table .border-right th,
+.custom-table .border-right td {
+  border-right: 1px solid #000;
+}
+</style>
+
+<!-- Table -->
+<div class="custom-table">
+  <table>
+    <tr>
+      <th colspan="1">LGA</th>
+      <th colspan="3">Program Reach</th>
+      <th colspan="3">Surveyed Coverage</th>
+      <th colspan="1">Reported Coverage</th>
+      <th colspan="1">Denominator</th>
+    </tr>
+    <tr class="bold-row">
+      <td></td>
+      <td>Mean (%)</td>
+      <td>% Lower bound CI</td>
+      <td>% Upper bound CI</td>
+      <td>Mean (%)</td>
+      <td>% Lower bound CI</td>
+      <td>% Upper bound CI</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Emohua</td>
+      <td>84%</td>
+      <td>82%</td>
+      <td>86%</td>
+      <td>83%</td>
+      <td>78%</td>
+      <td>87%</td>
+      <td>86%</td>
+      <td>1,671</td>
+    </tr>
+    <tr>
+      <td>Opobo / Nkoro</td>
+      <td>92%</td>
+      <td>90%</td>
+      <td>94%</td>
+      <td>91%</td>
+      <td>88%</td>
+      <td>94%</td>
+      <td>86%</td>
+      <td>701</td>
+    </tr>
+  </table>
+</div>
+
+The findings indicate a program reach  of 84% in Emohua and 92% in Opobo/Nkoro (**Table 9**). The surveyed coverage (the proportion of interviewed individuals who swallowed the drug) was 83% in Emohua and 91% in Opobo/Nkoro. While CV was only conducted in two LGAs, and therefore not representative of the entire state, **surveyed coverage for the two LGAs was above the WHO’s recommended 75% therapeutic coverage threshold for STH**.
+
+When comparing the surveyed coverage to the reported coverage, **we found that reported coverage for Emohua LGA was within the 95% confidence interval of the surveyed coverage. This suggests that the reporting system is working well**.
+
+**The reported coverage for Opobo/Nkoro LGA on the other hand was outside the 95% confidence interval of the surveyed coverage. This suggests that the reporting system is not working well**.
+
+##### **Figure 21: Disaggregation by gender, enrollment status, and school type**
+
+/*figure 21*/
+
+A disaggregation by gender revealed a comparable (not more than one percentage point difference) program reach and surveyed coverage for one arm compared to the other, indicating that the program did not reach more of one gender. By enrollment status and school type, a much higher program reach and surveyed coverage was noted for the enrolled children and public schools. 
+
+### <span style="color:#fe6e87;">5.2 Reasons Drugs Were Not Provided and Non-compliance</span>
+
+Compliance rates (those who reported receiving the drug and swallowing it) were very high (99%). Unavailability of children in school (54%) was the main reason provided by those who did not receive the deworming medicine, distantly followed by the school not receiving deworming medicine (14%) – **Figure 22**.
+
+##### **Figure 22: Reasons the drug was not given (n=322)**
+
+/*figure*/
+
+### <span style="color:#fe6e87;">5.3 Unprogrammed Deworming</span>
+
+Aside from the present deworming, monitors also sought to determine if respondents had received any deworming medicine within the last six months of deworming day. The findings indicate that 21% of respondents (compared to 17% in Year 5) had received the tablet prior to deworming day in the last six months. Among the 507 children that received a deworming tablet within 6 months of deworming day, 95% indicated that the drug was taken from their homes, 3% took the deworming medicine from a pharmacy and 2% took it from a health facility. This low self-reported proportion further underlines the importance of having the MDA.
+
+## <span style="color:#fe6e87;">6.0 Priorities and Way Forward</span>
+
+<!-- Table Styles -->
+<style>
+.custom-table {
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 1px solid #000;
+  padding: 8px;
+  text-align: center;
+}
+
+.custom-table th {
+  background-color: #fe6e87;
+}
+</style>
+
+<!-- Table -->
+<table class="custom-table">
+  <thead>
+    <tr>
+      <th>Priorities</th>
+      <th>Results</th>
+      <th>Way Forward</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Training</td>
+<td>**Successes:**
+
+●	There was a 20 percentage point increase in teacher training attendance from 56% in year 5.
+
+●	There was a 12 percentage point increase in school attendance from 52% in year 5.
+
+●	At least 94% of all training centers covered all the expected training topics.
+
+●	The coverage of steps to be taken in cases of SAEs at teacher training increased (from 86% in year 5 to 94%).
+
+●	Most of the messages on all steps of drug administration were covered in at least 86% of LGA and 77% of teacher training sessions.
+
+●	At the LGA training, messages on handwashing before treatment was the least covered at 86%.
+
+●	At the teacher training, messages on checking the child’s mouth to ensure  that each child chews and swallows the tablet were least covered at 77%.
+
+**Challenges:**
+
+●	While there was an increase in school attendance, 36% of the expected schools didn’t have a representative in the teacher training.
+
+●	While a majority of the topics were covered, there is still a need to ensure community sensitization is covered in all trainings, as this year it was covered in only 94% of the teacher trainings observed.</td>
+<td>
+●	The program works with the government and schools to reiterate the importance of the trainings to increase the attendance rate for the teacher trainings.
+
+●	To emphasize to Master Trainers the importance of fully covering all topics in teacher trainings.
+
+●	To reinforce that all topics in the training booklets should be covered in all training sessions. Additionally, the program team will liaise the Ministry of Education to ensure that deworming training remains a priority, and the assignment of teachers does not clash with other ongoing programs.
+
+●	Information about training dates, venue and expected participants should reach out to all schools in good time
+
+</tr>
+<tr>
+<td>Community Sensitization</td>
+<td>
+**Successes:**
+
+●	All (100%) teacher training attendees reported the correct date of deworming post training. 
+
+●	Children (74%) and teachers (40%) were the most cited sources of information for parents, with town announcer (49%), radio (45%) and teachers (42%) as the most preferred sources of information.
+
+**Challenges:**
+
+●	Overall, 73% of parents interviewed were aware of deworming day; including 86% of parents of enrolled children, and 43% of parents of non-enrolled children, which is a decrease from the previous year (82% of parents were aware - 92% of enrolled and 58% of non-enrolled).
+
+●	Sixty-eight percent (68%) of monitored schools were utilizing at least one awareness activity or material, which dropped from year 5 rate of 77%.
+
+●	During community interviews with parents on deworming day, 21% of parents (20% of enrolled and 24% of parents of non-enrolled) indicated that they had concerns or questions about the deworming activity. The concerns included sensitization on worm infection and prevention (11%), the safety of the deworming medicine (8%), involving parents in the program’s training (6%), deworming to be done at households and hospitals (6%), the program’s continuation (6%), and creating awareness early (3%); questions included why adults are not being dewormed (39%), how long the program will last (6%), who is providing the deworming medicine - the government or the health facility (6%), whether the deworming medicine is provided for free (6%), whether deworming is only done in schools (3%) and why non-enrolled children are not getting deworming messages (3%).
+
+●	Parents had little knowledge of the target age group and worms (both at 48%).
+
+●	The main reasons cited by parents for not sending children for deworming was lack of awareness (55%).
+
+</td>
+<td>
+●	To have focused/targeted messages to the parents of enrolled and non-enrolled SAC to ensure parents are aware of deworming day, the benefits of deworming, type of worms, target age-group and to reduce concerns and questions around deworming as a whole. The program team should also emphasize the importance of schools displaying posters in clearly visible locations.
+
+●	Sustain the use of all stakeholders, especially the community structures, when sensitizing communities.
+
+●	Explore possible approaches for integrating community sensitization into other health programs (i.e. immunization, malaria control, etc) to reduce costs and engage a wider audience.
+
+</td>
+</tr>
+
+<tr>
+<td>Deworming Week</td>
+<td>
+**Successes:**
+
+●	In 2022, the supply chain for key materials was moderate:
+
+ -All (100%) schools had received mebendazole before deworming day.
+      
+ -Seventy-five percent (75%) of schools had received reporting forms before deworming day, and 75% of schools had both drugs and reporting forms on deworming day.
+      
+●	On deworming day, all (100%) members of the deworming team (teachers) knew the correct dosage, and that the drug for STH treatment was mebendazole.
+
+●	Seventy percent (70%) of teachers shared health messages with children before deworming.
+
+●	During deworming, 92% of teachers recorded treatment in the treatment register.
+
+●	There were no reports of SAE in schools
+
+**Challenges:**
+
+●	Only 12% of the observed schools dewormed non-enrolled children. The main reason cited by head teachers for not planning to deworm non-enrolled children is that they will not accept going for deworming.
+
+●	The schools that were monitored struggled to deworm the children on the designated date, as 47 out of 54 conducted deworming on the designated day, for a rate of 87%. 
+
+●	Teachers were unable to enforce hand-washing prior to treatment (37%), which was the same as the previous year.
+
+●	Twenty-five of the 60 schools (42%) monitored had at least one eligible child who was not treated due to factors such as parental refusal (11), child refusal (4), a sick child (3), drugs were finished (2), child has not eaten (2), fear of drugs (1), child has already taken deworming medicine (1), or all eligible children were dewormed (1). 
+
+</td>
+<td>
+●	To work with the schools to ensure they are ready to treat on the planned day to ensure the highest possibility of attendance by the children. 
+
+●	To continue to work with the government and community leaders are increasing the percentage of non-enrolled children who are treated. One action we could take is following up with parents of no-enrolled children to confirm whether they are receiving the relevant announcements about deworming days.
+
+●	To ensure that protocols, such as the importance of hand-washing by children prior to treatment, are reviewed in training and followed on deworming day.
+
+●	Plan ahead of time and provide adequate logistics to support health teams to be able to deworm non enrolled SAC in the hard to reach areas ●	To work with the schools to ensure they are ready to treat on the planned day to ensure the highest possibility of attendance by the children. 
+
+●	To continue to work with the government and community leaders are increasing the percentage of non-enrolled children who are treated. One action we could take is following up with parents of no-enrolled children to confirm whether they are receiving the relevant announcements about deworming days.
+
+●	To ensure that protocols, such as the importance of hand-washing by children prior to treatment, are reviewed in training and followed on deworming day.
+
+●	Plan ahead of time and provide adequate logistics to support health teams to be able to deworm non enrolled SAC in the hard to reach areas
+
+</td>
+<tr>
+<td>Coverage Validation</td>
+<td>
+**Successes:**
+
+●	Based on CV, the overall surveyed coverage for SAC in Emohua and Opobo/Nkoro LGAs achieved the WHO’s recommended 75% therapeutic coverage threshold for STH treatment. Additionally, the coverage validation results from Emohua LGA suggest that the treatment reporting system is working well.
+
+●	Compliance rates (those who reported receiving the drug and swallowing it) were very high at 99%.
+
+**Challenges:**
+
+●	The reported coverage for Opobo/Nkoro LGA on the other hand was outside the 95% confidence interval of the surveyed coverage. This suggests that the reporting system is not working well.
+
+</td>
+<td>
+●	The program team should investigate reporting challenges and work with the government to address these concerns and identify areas for improvement with treatment data and reporting in Opodo/Nkoro LGA.
+</td>
+</tr>
+</tbody>
+</table>
+
+
 
 
 
