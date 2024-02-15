@@ -1,6 +1,12 @@
 ---
 title: <span style="color:#fe6e87;">Deworm the World Initiative-<br> Rivers State, Nigeria</span>
-output: html_document
+output: 
+    html_document:
+      toc: yes
+      toc_depth: 4
+      toc_float:
+        collapsed: no
+        smooth_scroll: no
 runtime: shiny
 ---
 
@@ -14,6 +20,7 @@ runtime: shiny
 **Prepared by:** 	Evidence Action
 
 **For:**                    	GiveWell and partners, Nigerian Ministries of Health and Education
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -63,49 +70,7 @@ con <- dbConnect(
 # dbDisconnect(con)
 ```
 
-
-### <span style="color:#fe6e87;">Table of Contents</span>
-
-```{r toc}
-contents <- c(
-  "Glossary" = 3,
-  "1.0 Executive Summary" = 4,
-  "2.0 Background" = 6,
-  "3.0 Methodology" = 7,
-  "3.1 Process Monitoring" = 7,
-  "3.2 Coverage Validation" = 7,
-  "4.0 Process Monitoring Results" = 8,
-  "4.1 Training Results" = 8,
-  "Topic coverage" = 10,
-  "Topic 1: Health Education" = 10,
-  "Topic 2: Target Population" = 11,
-  "Topic 3: Roles and Responsibilities" = 11,
-  "Topic 4: Community Sensitization" = 12,
-  "Topic 5: Recording and Reporting Forms" = 13,
-  "Topic 6: Drug Administration" = 14,
-  "Topic 7: Side Effects" = 15,
-  "Training Logistics" = 17,
-  "4.2 Distribution of Drugs and Materials" = 17,
-  "4.3 Community Sensitization" = 18,
-  "4.4 Deworming Week" = 23,
-  "5.0 Coverage Validation Results" = 25,
-  "5.1 STH Results" = 25,
-  "5.2 Reasons Drugs Were Not Provided and Non-compliance" = 26,
-  "5.3 Unprogrammed Deworming" = 27,
-  "6.0 Priorities and Way Forward" = 28
-)
-
-# Create a data frame from the vector
-toc_df <- data.frame(Content = names(contents), Page = unname(contents))
-
-
-# Print the table of contents
-kable(toc_df, "html") %>%
-  kable_styling()
-
-```
-
-### <span style="color:#fe6e87;">Glossary</span>
+# <span style="color:#fe6e87;">Glossary</span>
 
 ```{r glossary}
 library(kableExtra)
@@ -127,20 +92,20 @@ kable(glossary, col.names = NULL) %>%
 ```
 
 
-## <span style="color:#fe6e87;">1.0 Executive Summary</span>
+# <span style="color:#fe6e87;">1.0 Executive Summary</span>
 
 
 This report summarizes the results of two rounds of process monitoring during the May and November 2022 deworming rounds and one coverage validation (PMCV)  exercise following the first round of deworming in Rivers State, Nigeria. As a technical assistance partner to the Government of Rivers State, Evidence Action supports PMCV to determine what worked well and identify existing challenges within the implementation process and assess the accuracy of the reported government treatment data in select local government authorities (LGAs).
  In 2022, Rivers carried out its sixth year of school-based deworming targeting both enrolled  and non-enrolled school-age children (SAC), 5-14 years. 
 In total, 1.88 million  SAC were targeted for deworming treatments across 21 endemic LGAs for soil-transmitted helminths (STH) and 1.64 million SAC were treated (87% government reported treatment coverage). 
 
-#### **Coverage Validation Findings**
+##### **Coverage Validation Findings**
 
 Coverage validation (CV) surveys were conducted within 6 weeks of round one MDA treatment within two randomly selected LGAs – Emohua and Opobo/Nkoro to evaluate the program reach and surveyed coverage. The findings indicate that 84% of SAC in Emohua and 92% in Opobo/Nkoro were offered the chance to swallow the drug (program reach), with 83% of SAC in Emohua and 91% in Opobo/Nkoro ingesting the drug (surveyed coverage).
 While CV was only conducted in two LGAs, and therefore not representative of the entire state, surveyed coverage for the two LGAs was above the WHO’s recommended 75% therapeutic coverage threshold for STH, indicating that these geographic units are on track to achieving disease control. 
 When comparing surveyed coverage to government-reported coverage, reported coverage for Emohua LGA was within the 95% confidence interval of the surveyed coverage. This suggests that the reporting system is working well. The reported coverage for Opobo/Nkoro LGA was outside the 95% confidence interval of the surveyed coverage. This suggests that the reporting system in this LGA is not working well. Read more on coverage validation on page 25
 
-#### **Process Monitoring Findings**
+##### **Process Monitoring Findings**
 
 ```{r process monitoring, echo = FALSE}
 
@@ -582,7 +547,7 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
 
 Overall, Y6 implementation was successful, with several KPIs improving since the previous round. Improvements in school attendance resulted in a 20 percentage point increase from 56% in year 5. On deworming week, material distribution was also commendable, with all (100%) and 75% of schools having deworming medicine and monitoring forms,  respectively. Community awareness of deworming through IEC deworming materials or word of mouth was at 73% among parents. During deworming week, the number of schools distributing mebendazole tablets increased; 87% of expected schools distributed tablets, a 27 percentage point increase from the previous year. Further details on priorities for program improvement and ways forward can be found on page 28.
 
-## <span style="color:#fe6e87;">2.0 Background</span>
+# <span style="color:#fe6e87;">2.0 Background</span>
 
 In total, 1.88 million  SAC were targeted for deworming treatments across 21 endemic LGAs for soil-transmitted helminths (STH) and 1.64 million SAC were treated (87% government reported treatment coverage).
 
@@ -591,9 +556,9 @@ Approximately 9760 teachers were trained to properly administer deworming drugs.
 Evidence Action recruited an independent firm, Infotrak Research, and Consulting, to monitor random samples of program activities to assess the quality of implementation, adherence to protocol, and supply chain effectiveness. During the year, monitors observed 14 LGA trainings, 47 teacher trainings, and 60 schools on deworming day, and interviewed 168 parents in the community. Evidence Action designed data collection tools and sampling methods, and cleaned and analyzed the data from the above activities. The findings are presented in this report.
 
 
-## <span style="color:#fe6e87;">3.0 Methodology</span>
+# <span style="color:#fe6e87;">3.0 Methodology</span>
 
-### <span style="color:#fe6e87;">3.1 Process Monitoring</span>
+## <span style="color:#fe6e87;">3.1 Process Monitoring</span>
 
 To assess the quality of teacher training and the implementation of deworming, Evidence Action randomly selected 48 of approximately 339 total teacher training sessions for observation and training assessment, and 60 of about 5,410 total schools for observation and interviews of teachers, children, and parents by independent monitors on deworming day. Seventy percent (73% in round one and 67% in round two) of schools observed were primary level, 17% (17% in each round) were junior secondary level, 10% (10% in each round) included both levels, and 3% (0% in round one and 7% in round two)were nursery and primary level. By school type, 58% (63% in round one and 53% in round two) were public and 42% (37% in round one and 47% in round two) were private. 
 
@@ -605,7 +570,7 @@ On deworming day, monitors interviewed head teachers and teachers from sampled s
 
 ![](https://i.postimg.cc/W16JhSdk/figure-1.jpg)
 
-### <span style="color:#fe6e87;">3.2 Coverage Validation</span>
+## <span style="color:#fe6e87;">3.2 Coverage Validation</span>
 
 A few weeks after the round one MDA, monitors conducted coverage validation to determine the program reach and surveyed coverage, per WHO guidelines while surveying schools and communities. A total of 2,372 children were interviewed from the two LGAs using a two-stage probability proportional to estimated size (PPES) sampling design.
 
@@ -906,9 +871,9 @@ A few weeks after the round one MDA, monitors conducted coverage validation to d
   </tbody>
 </table>
 
-## <span style="color:#fe6e87;">4.0 Process Monitoring Results</span>
+# <span style="color:#fe6e87;">4.0 Process Monitoring Results</span>
 
-### <span style="color:#fe6e87;">4.1 Training Results</span>
+## <span style="color:#fe6e87;">4.1 Training Results</span>
 
 ```{r training-results, echo=FALSE}
 
@@ -1147,7 +1112,7 @@ grid.arrange(plot, plot2, plot3, ncol = 1)
 ```
 
 
-#### <span style="color:#fe6e87;">Topic coverage</span>
+### <span style="color:#fe6e87;">Topic coverage</span>
 
 Seven topics were meant to be covered across the training sessions. The topic of community sensitization was covered in 94% of the training sessions, while at least 98% of the training sessions covered the other six topics. The topics of recording and reporting forms, health education, target population, and deworming medicine administration were covered in all (100%) training - **Figure 4.** 
 
@@ -1258,7 +1223,7 @@ plot <- ggplot(data_sum, aes(x = variable_mapped, y = total, fill = variable_map
     geom_text(aes(label = scales::percent(total), y = total, group = variable_mapped), 
               position = position_stack(vjust = 0.5), size = 3) +
 
-    labs(title = "Health education topics\ncompletely covered in trainings (n=47)", x = NULL, y = NULL) +
+    labs(title = "Health education topics\ncompletely covered in trainings\n(n=47)", x = NULL, y = NULL) +
 
     coord_flip() +
     theme_minimal() +
@@ -1272,7 +1237,7 @@ plot2 <- ggplot(data, aes(x = sourcefile, y = value, fill = sourcefile)) +
      labs(title = "Pre- and post-\nknowledge on transimission", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
-     theme(axis.text.x = element_blank()) +  # Remove x-axis text
+     theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "bottom") +
      geom_text(aes(label = scales::percent(value), group = attibutes),
                position = position_dodge(width = 0.8),  
                vjust = -0.5, size = 3) +  
@@ -1294,105 +1259,6 @@ Proper identification of the target group is critical to meeting the program goa
 ##### **Figure 6: Information on target population and pre-post knowledge of treatment eligibility criteria**
 
 ```{r figure6, echo=FALSE}
-
-library(ggplot2)
-library(gridExtra)
-library(stringr)
-
-# SQL query LGA training
-sql_query <- "SELECT * FROM lga_obs 
-WHERE year = 2022
-AND state = 'Rivers'
-AND round = 'Overall'
-AND variable = 'STH treatment will be provided to all children aged 5-14 years'"
-
-data <- dbGetQuery(con, sql_query)
-
-# Mapping original variable names to desired names
-variable_mapping <- c('STH treatment will be provided to all children aged 5-14 years' = 'All children aged 5-14 years will be treated for STH')
-
-# Creating a new variable with the desired names
-data$variable_mapped <- variable_mapping[data$variable]
-
-# SQL query to sum the values for 'Covered Completely' and 'Covered Partially' Teacher training
-sql_query2 <- "SELECT year, state, round, variable,
-  'Teacher Training' AS attibutes,
-  SUM(CASE WHEN attibutes = 'Covered Completely' THEN value ELSE 0 END) +
-  SUM(CASE WHEN attibutes = 'Covered Partially' THEN value ELSE 0 END) AS total_sum
-FROM tt_obs
-WHERE
-  year = 2022
-  AND state = 'Rivers'
-  AND round = 'Overall'
-  AND variable = 'STH treatment will be provided to all children aged 5-14 years:'
-  AND attibutes IN ('Covered Completely', 'Covered Partially')
-GROUP BY year, state, round, variable"
-
-data2 <- dbGetQuery(con, sql_query2)
-
-# Mapping original variable names to desired names
-variable_mapping <- c('STH treatment will be provided to all children aged 5-14 years:' = 'All children aged 5-14 years will be treated for STH')
-
-# Creating a new variable with the desired names
-data2$variable_mapped <- variable_mapping[data2$variable]
-
-# SQL query deworming team
-sql_query3 <- "SELECT * FROM dd_main
-WHERE year = 2022
-AND state = 'Rivers'
-AND round = 'Overall'
-AND variable = '% of deworming team with full knowledge of STH treatment'"
-
-data3 <- dbGetQuery(con, sql_query3)
-
-# Mapping original variable names to desired names
-variable_mapping <- c('% of deworming team with full knowledge of STH treatment' = 'School deworming team knowledge of correct age-group (n=60)')
-
-# Creating a new variable with the desired names
-data3$variable_mapped <- variable_mapping[data3$variable]
-
-# Plotting for LGA training data
-plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
-    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
-              position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "LGA training (n=14)", x = NULL, y = NULL) +
-    coord_flip() +
-    theme_minimal() +
-    theme(axis.text.x = element_blank()) +  # Remove x-axis text
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-# Plotting for Teacher training data
-plot2 <- ggplot(data2, aes(x = variable_mapped, y = total_sum, fill = variable_mapped)) +
-    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-    geom_text(aes(label = scales::percent(total_sum), y = total_sum, group = variable_mapped), 
-              position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Teacher training (n=47)", x = NULL, y = NULL) +
-    coord_flip() +
-    theme_minimal() +
-    theme(axis.text.x = element_blank()) + # Remove x-axis text
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-# Plotting for deworming team data
-plot3 <- ggplot(data3, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
-    geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-    geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
-              position = position_stack(vjust = 0.5), size = 3) +
-    labs(title = "Deworming day knowledge of the target age-group", x = NULL, y = NULL) +
-    coord_flip() +
-    theme_minimal() +
-    theme(axis.text.x = element_blank()) +  # Remove x-axis text
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-# plotting
-grid.arrange(plot, plot2, plot3, ncol=1)
-```
-
-
-
-
-
-```{r figure6(ii), echo=FALSE}
 
 library(ggplot2)
 library(gridExtra)
@@ -1447,7 +1313,7 @@ plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
      labs(title = "Knowledge on non-eligible persons", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
-     theme(axis.text.x = element_blank()) +  # Remove x-axis text
+     theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "bottom") +  
      geom_text(aes(label = scales::percent(value), group = attibutes),
                position = position_dodge(width = 0.8),  
                vjust = 0.5, size = 3) +  
@@ -1456,7 +1322,7 @@ plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
 
 
-# Adjust the overall layout to add spacing between the plots
+# display plot
 grid.arrange(plot, plot2, ncol = 2)
 ```
 
@@ -1471,16 +1337,27 @@ The success of the MDA hinges on the proper identification of the contributions 
 library(ggplot2)
 library(gridExtra)
 library(stringr)
+library(patchwork)
+
+# sql query responsibilities of headteachers
+sql_query <- "SELECT * FROM lga_obs
+WHERE year = 2022
+AND state = 'Rivers'
+AND round  = 'Overall'
+AND variable = 'According to the trainer, what is the responsibility of the Head Teacher?'
+AND attibutes NOT IN('Other:Attending the training and nominating teachers to attend')"
+
+data <- dbGetQuery(con, sql_query)
 
 # sql query responsibilities of teachers tt
-sql_query <- "SELECT * FROM tt_obs
+sql_query2 <- "SELECT * FROM tt_obs
 WHERE year = 2022
 AND state = 'Rivers'
 AND round = 'Overall'
 AND variable = 'According to the trainers, what is the role of the teachers/CIs in the deworming program?'
 AND attibutes IN ('To organize drug administration in schools', 'To disseminate health education messages for children and parents during assembl','To mobilize non-enrolled school-aged children','To complete forms for registration and reporting')"
 
-data <- dbGetQuery(con, sql_query)
+data2 <- dbGetQuery(con, sql_query2)
 
 # Mapping original variable names to desired names
 variable_mapping <- c('To organize drug administration in schools' = 'To organize administration of deworming medicine in schools',
@@ -1489,35 +1366,10 @@ variable_mapping <- c('To organize drug administration in schools' = 'To organiz
                       'To complete forms for registration and reporting' = 'To complete forms for registration and reporting')
 
 # Creating a new variable with the desired names
-data$variable_mapped <- variable_mapping[data$attibutes]
-
-# Use reorder to arrange bars based on value
-data$variable_mapped <- reorder(data$variable_mapped, data$value)
-
-# Plotting for Non-eligible persons data
-plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)) +
-     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
-               position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Responsibilities of teachers covered during teacher training (n=47)", x = NULL, y = NULL) +
-     coord_flip() +
-     theme_minimal() +
-     theme(axis.text.x = element_blank()) +  
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-print(plot)
-```
-
-
-
-```{r figure7(ii), echo = FALSE}
-
-library(ggplot2)
-library(gridExtra)
-library(stringr)
+data2$variable_mapped <- variable_mapping[data2$attibutes]
 
 # sql query responsibilities of flhf staff
-sql_query <- "SELECT * FROM tt_obs
+sql_query3 <- "SELECT * FROM tt_obs
 WHERE year = 2022
 AND state = 'Rivers'
 AND round = 'Overall'
@@ -1525,26 +1377,43 @@ AND variable = 'According to the trainers, what is the role of the frontline hea
 AND attibutes IN  ('To communicate the rationale of the intervention to community leaders',
 'To participate in community awareness creation for drug administration campaign', 'To manage side-effects', 'To manage, refer, and report children with severe adverse effects', 'To help with treating non-enrolled children')"
 
-data <- dbGetQuery(con, sql_query)
+data3 <- dbGetQuery(con, sql_query3)
 
-# Use reorder to arrange bars based on value
-data$attibutes <- reorder(data$attibutes, data$value)
-
-# Plotting for responsibilities of flhf staff data
-plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
+# Plotting for responsibilities of headteachers data
+plot <- ggplot(data, aes(x = reorder(attibutes,value), y = value, fill = attibutes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Responsibilities of FLHF staff covered during teacher training (n=47)", x = NULL, y = NULL) +
+     labs(title = "Responsibilities of head teachers covered during LGA\ntraining (n=14)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 60))
 
-print(plot)
+# Plotting for responsibilities of teachers data
+plot2 <- ggplot(data2, aes(x = reorder(variable_mapped,value), y = value, fill = variable_mapped)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Responsibilities of teachers covered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 70))
 
+# Plotting for responsibilities of flhf staff data
+plot3 <- ggplot(data3, aes(x = reorder(attibutes,value), y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Responsibilities of FLHF staff covered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 70))
+
+print(plot/plot2/plot3)
 ```
-
 
 **Figure 8**, below, shows frontline health facility (FLHF) staff knowledge of their roles and responsibilities on deworming day.
 
@@ -1592,8 +1461,6 @@ plot <- ggplot(data, aes(x = variable_mapped, y = value, fill = variable_mapped)
 
 print(plot)
 ```
-
-/* figure */
 
 
 #### <span style="color:#fe6e87;">Topic 4: Community Sensitization</span>
@@ -1662,9 +1529,6 @@ plot2 <- ggplot(data2, aes(x = attibutes, y = value, fill = attibutes)) +
 
 print(plot|plot2)
 ```
-
-
-/* figure2 */
 
 #### <span style="color:#fe6e87;">Topic 5: Recording and Reporting Forms</span>
 
@@ -2368,11 +2232,12 @@ Side effects are potential outcomes of any treatment that may or may not be dire
 
 ##### **Figure 12: Messages shared about side effects, participants’ pre- and post-training knowledge and FLHF on deworming day** 
 
-```{r figure12, echo=FALSE}
+```{r figure12, echo=FALSE,out.width='100%', fig.height=6, fig.width = 8}
 
 library(ggplot2)
 library(gridExtra)
 library(stringr)
+library(patchwork)
 
 # sql query messages covered under side effects
 sql_query <- "SELECT * FROM tt_obs
@@ -2397,57 +2262,47 @@ AND attibutes IN ('Headache', 'Nausea', 'Abdominal discomfort', 'Vomiting', 'Fai
 
 data2 <- dbGetQuery(con, sql_query2)
 
-# plotting
-plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
-     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
-     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
-               position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Messages covered under\nside effects (n=47)", x = NULL, y = NULL) +
-     coord_flip() +
-     theme_minimal() +
-     theme(axis.text.x = element_blank()) +  
-    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
-     geom_bar(stat = "identity", position = "dodge", color = "white") +
-     facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
-     labs(title = "Pre- and post- knowledge", x = NULL, y = NULL) +
-     coord_flip() +
-     theme_minimal() +
-     theme(axis.text.x = element_blank()) +  # Remove x-axis text
-     geom_text(aes(label = scales::percent(value), group = attibutes),
-               position = position_dodge(width = 0.8),  
-               vjust = 0.5, size = 3) +  
-     scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
-  guides(fill = guide_legend(override.aes = list(title = NULL)))+
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
-
-grid.arrange(plot, plot2, ncol = 2)
-```
-
-
-
-```{r figure12(ii), echo=FALSE}
-
-library(ggplot2)
-library(gridExtra)
-library(stringr)
-
 #sql query to get data
-sql_query <- "SELECT * FROM dd_main
+sql_query3 <- "SELECT * FROM dd_main
 WHERE year = 2022
 AND state = 'Rivers'
 AND round = 'Overall'
 AND variable = 'ASK: What are side effects that would be considered normal while treating for STH with Albendazole?'
 AND attributes IN ('Headache', 'Nausea', 'Abdominal discomfort', 'Vomiting', 'Dizziness', 'Fatigue')"
 
-data <- dbGetQuery(con, sql_query)
+data3 <- dbGetQuery(con, sql_query3)
 
 # Use reorder to arrange bars based on value
-data$attributes <- reorder(data$attributes, data$value)
+data3$attributes <- reorder(data3$attributes, data3$value)
 
-# Plotting
-plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
+# plotting
+plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = "Messages covered\nunder side effects\n(n=47)", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.x = element_blank()) +  
+    scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Plotting 2
+plot2 <- ggplot(data2, aes(x = sourcefile, y = value, fill = sourcefile)) +
+     geom_bar(stat = "identity", position = "dodge", color = "white") +
+     facet_wrap(~attibutes, scales = 'free_y', ncol = 1) +
+     labs(title = "Pre- and post- knowledge", x = NULL, y = NULL) +
+     coord_flip() +
+     theme_minimal() +
+     theme(axis.text.y = element_blank(), axis.text.x = element_blank(), legend.position = "bottom") +  
+     geom_text(aes(label = scales::percent(value), group = attibutes),
+               position = position_dodge(width = 0.9),  
+               vjust = 0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#D3D3D3"), name = NULL)+
+  guides(fill = guide_legend(override.aes = list(title = NULL)))+
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))
+
+# Plotting 3
+plot3 <- ggplot(data3, aes(x = attributes, y = value, fill = attributes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
                position = position_stack(vjust = 0.5), size = 3) +
@@ -2457,7 +2312,9 @@ plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
      theme(axis.text.x = element_blank()) +  
     scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) 
 
-print(plot)
+# Arrange the plot with adjusted layout
+ plot + plot2 + plot3 + 
+  plot_layout(widths = 1)
 ```
 
 ##### **Table 5: Coverage and retention of knowledge of side effects in LGA and teacher trainings and on deworming day**
@@ -2751,11 +2608,11 @@ print(plot)
 </table>
 
 
-#### <span style="color:#fe6e87;">Training Logistics</span>
+### <span style="color:#fe6e87;">Training Logistics</span>
 
 /* figure */
 
-### <span style="color:#fe6e87;">4.2 Distribution of Drugs and Materials</span>
+## <span style="color:#fe6e87;">4.2 Distribution of Drugs and Materials</span>
 
 ```{r distribution-of-materials, echo = FALSE}
 
@@ -3053,7 +2910,7 @@ From post-deworming interviews with head teachers, 97% indicated the sufficiency
      </tbody>
    </table>
    
-### <span style="color:#fe6e87;">4.3 Community Sensitization</span>
+## <span style="color:#fe6e87;">4.3 Community Sensitization</span>
 Community sensitization before deworming day is an evidence-supported factor critical for MDA success. On deworming day, monitors interviewed 168 parents (119 of enrolled children and 49 of non-enrolled children) to gauge their awareness of the MDA, as well as their sources of MDA information. **Table 7** shows statistics from these interviews.
 
 ##### **Table 7: Demographic characteristics of households visited**
@@ -3503,7 +3360,7 @@ Community sensitization before deworming day is an evidence-supported factor cri
     </tbody>
    </table>
    
-#### <span style="color:#fe6e87;">Parents Deworming Knowledge</span>
+##### <span style="color:#fe6e87;">Parents Deworming Knowledge</span>
 
 Seventy-three percent (73%) of parents interviewed on deworming day (down from 82% last year) were aware of deworming happening within their communities, with this proportion being higher among parents of enrolled children (86%) compared to parents of non-enrolled children (43%, Figure 15). Overall awareness was at 77% (90% parents of enrolled children and 41% parents of non-enrolled) in round two, which is 7 percentage points higher than in round one (81% parents of enrolled children and 44% parents of non-enrolled).
 
@@ -3596,7 +3453,7 @@ print(plot/plot2/plot3)
 During community interviews with parents on deworming day, 21% of parents (20% of enrolled and 24% of non-enrolled) indicated that they had concerns or questions about the deworming activity. The concerns included sensitization on worm infection and prevention (11%), the safety of the deworming medicine (8%), involving parents in the program’s training (6%), the program’s continuation (6%), and the need for early awareness (3%); questions included why adults are not being dewormed (39%), how long the program will last (6%), who is providing the deworming medicine - the government or the health facility (6%), whether the deworming medicine is provided for free (6%), whether deworming is only done in schools (3%) and why non-enrolled children are not getting deworming messages (3%).
 
 
-#### <span style="color:#fe6e87;">Sources of Deworming Day Information</span>
+##### <span style="color:#fe6e87;">Sources of Deworming Day Information</span>
 
 ```{r sources_dd, echo = FALSE}
 
@@ -3861,7 +3718,7 @@ print(plot/plot2/plot3/plot4/plot5/plot6/plot7/plot8/plot9)
 ```
 
 
-#### <span style="color:#fe6e87;">Parents’ Reasons for Not Sending Children for Deworming</span>
+##### <span style="color:#fe6e87;">Parents’ Reasons for Not Sending Children for Deworming</span>
 
 ```{r reason-not-sending, echo = FALSE}
 
@@ -3922,7 +3779,7 @@ plot <- ggplot(data, aes(x = attributes, y = value, fill = attributes)) +
 print(plot)
 ```
 
-#### <span style="color:#fe6e87;">FLHF Interview</span>
+##### <span style="color:#fe6e87;">FLHF Interview</span>
 
 After speaking with parents in the community surrounding schools, the monitors also spoke with the FLHF in the community. Below - **Figure 19**, shows the results of this interview on their knowledge of deworming day.
 
@@ -4027,15 +3884,15 @@ plot4 <- ggplot(data4, aes(x = attributes, y = value, fill = attributes)) +
 print(plot/plot2/plot3/plot4)
 ```
 
-### <span style="color:#fe6e87;">4.4 Deworming Week</span>
+## <span style="color:#fe6e87;">4.4 Deworming Week</span>
 
 Ninety-seven percent (97% - for both round one and round two) of head teachers interviewed on deworming day indicated that either they (70% - for both round one and round two) or another teacher at the school (27% - in both round one and round two) had attended a training session in preparation for deworming day within 30 days of the MDA. A follow-up interview with a member of the deworming team also revealed that all (100%) of them had either attended the training or been sensitized within the school on how to administer deworming drugs. 
 
-#### <span style="color:#fe6e87;">Deworming Week Delivery</span>
+##### <span style="color:#fe6e87;">Deworming Week Delivery</span>
 
 Of the 60 schools that were originally sampled for deworming day monitoring, 13 schools were replaced due to various challenges:  five could not be located or accessed; four were not aware of deworming; two were not deworming; one had rescheduled deworming; and one had closed down. Of the originally sampled schools that were in session, could be located, and had parental consent for deworming, 47 out of 54 conducted deworming on the designated day, for a rate of 87%, an increase from 60% from the previous year of deworming. All 13 of the schools that were not monitored due to the above reasons were replaced and monitored, bringing the total to 60.
 
-#### <span style="color:#fe6e87;">Adherence to MDA Procedures</span>
+##### <span style="color:#fe6e87;">Adherence to MDA Procedures</span>
 
 To provide quality assurance of the MDA administration, monitors observed whether deworming teams adhered to key drug administration steps. Results show high levels of compliance with the recommended practices - **Table 8**. However, the proportion of teachers who ensured that children washed their hands before treatment stood at 37%, this remained the same as that recorded in year 5, 2021. 
 
@@ -4269,11 +4126,11 @@ To provide quality assurance of the MDA administration, monitors observed whethe
  </tbody>
 </table>
 
-#### <span style="color:#fe6e87;">Management of Side Effects</span>
+##### <span style="color:#fe6e87;">Management of Side Effects</span>
 
 In the sample of schools where monitors observed and collected data on deworming day for each round, there were 3 cases of mild side effects reported – fever (1 - all in round two), headache (1 - all in round one), and vomiting (1 - all in round two). There were no SAE cases reported. 
 
-#### <span style="color:#fe6e87;">School Coverage of Eligible and Non-Enrolled Children</span>
+##### <span style="color:#fe6e87;">School Coverage of Eligible and Non-Enrolled Children</span>
 
 At 35 out of 60 (58%) monitored schools, every eligible child enrolled at the school was treated. At twenty-five schools at least one eligible child was not treated due to factors such as parental refusal (16), child’s refusal (12), fear of drugs (4), a sick child (4), a child’s absence from school (2) or a child who had already been dewormed (2). While 93% of head teachers indicated that they had made plans to deworm non-enrolled children on deworming day, only 12% of the observed schools dewormed non-enrolled children, which is a 2 percentage points increase from 2021. The main reason cited by head teachers for not planning to deworm non-enrolled children will not come for deworming (50%) - Figure 20.
 
@@ -4373,7 +4230,7 @@ plot3 <- ggplot(plot_data, aes(x = reorder(attributes, value), y = value, fill =
 print(plot/plot2/plot3)
 ```
 
-## <span style="color:#fe6e87;">5.0 Coverage Validation Results</span>
+# <span style="color:#fe6e87;">5.0 Coverage Validation Results</span>
 
 Coverage validation surveys were administered within six weeks of the MDA in two randomly selected LGAs – Emohua and Opobo/Nkoro. Coverage validation intended to achieve the following main objectives:
 
@@ -4381,7 +4238,7 @@ Coverage validation surveys were administered within six weeks of the MDA in two
 
 2.	To identify reasons for non-compliance
 
-### <span style="color:#fe6e87;">5.1 STH Results</span>
+## <span style="color:#fe6e87;">5.1 STH Results</span>
 
 ##### **Table 9: Coverage Validation Survey Results**
 
@@ -4476,7 +4333,7 @@ When comparing the surveyed coverage to the reported coverage, **we found that r
 
 A disaggregation by gender revealed a comparable (not more than one percentage point difference) program reach and surveyed coverage for one arm compared to the other, indicating that the program did not reach more of one gender. By enrollment status and school type, a much higher program reach and surveyed coverage was noted for the enrolled children and public schools. 
 
-### <span style="color:#fe6e87;">5.2 Reasons Drugs Were Not Provided and Non-compliance</span>
+## <span style="color:#fe6e87;">5.2 Reasons Drugs Were Not Provided and Non-compliance</span>
 
 Compliance rates (those who reported receiving the drug and swallowing it) were very high (99%). Unavailability of children in school (54%) was the main reason provided by those who did not receive the deworming medicine, distantly followed by the school not receiving deworming medicine (14%) – **Figure 22**.
 
@@ -4484,11 +4341,11 @@ Compliance rates (those who reported receiving the drug and swallowing it) were 
 
 /*figure*/
 
-### <span style="color:#fe6e87;">5.3 Unprogrammed Deworming</span>
+## <span style="color:#fe6e87;">5.3 Unprogrammed Deworming</span>
 
 Aside from the present deworming, monitors also sought to determine if respondents had received any deworming medicine within the last six months of deworming day. The findings indicate that 21% of respondents (compared to 17% in Year 5) had received the tablet prior to deworming day in the last six months. Among the 507 children that received a deworming tablet within 6 months of deworming day, 95% indicated that the drug was taken from their homes, 3% took the deworming medicine from a pharmacy and 2% took it from a health facility. This low self-reported proportion further underlines the importance of having the MDA.
 
-## <span style="color:#fe6e87;">6.0 Priorities and Way Forward</span>
+# <span style="color:#fe6e87;">6.0 Priorities and Way Forward</span>
 
 <!-- Table Styles -->
 <style>
