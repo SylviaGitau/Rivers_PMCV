@@ -3451,7 +3451,38 @@ Community sensitization before deworming day is an evidence-supported factor cri
 Seventy-three percent (73%) of parents interviewed on deworming day (down from 82% last year) were aware of deworming happening within their communities, with this proportion being higher among parents of enrolled children (86%) compared to parents of non-enrolled children (43%, Figure 15). Overall awareness was at 77% (90% parents of enrolled children and 41% parents of non-enrolled) in round two, which is 7 percentage points higher than in round one (81% parents of enrolled children and 44% parents of non-enrolled).
 
 ##### **Figure 15: Awareness among parents of enrolled and non-enrolled children**
- /*figure 15*/
+
+```{r figure15, echo=FALSE}
+
+names <- c("Y3R1", "Y3R2", "Y4R1", "Y5R1", "Y6R1", "Y6R2")
+Enrolled <- c(0.87, 0.82, 0.82, 0.92, 0.81, 0.90)
+Non_enrolled <- c(0.47, 0.55, 0.29, 0.58, 0.44, 0.41)
+Z <- data.frame(names, Enrolled, Non_enrolled)
+
+library(ggplot2)
+
+# Plot
+p <- ggplot(Z, aes(x = names)) +
+  geom_line(aes(y = Enrolled, color = "Line 1"), linetype = "solid", size = 1, show.legend = TRUE, group = 1) +
+  geom_point(aes(y = Enrolled, color = "Line 1"), size = 3, show.legend = TRUE) +
+  geom_line(aes(y = Non_enrolled, color = "Line 2"), linetype = "solid", size = 1, show.legend = TRUE, group = 2) +
+  geom_point(aes(y = Non_enrolled, color = "Line 2"), size = 3, show.legend = TRUE) +
+  geom_text(aes(y = Enrolled, label = paste0(round(Enrolled * 100), "%"), color = "Line 1"), 
+            vjust = -1, hjust = 0.5, show.legend = FALSE) +  # Adjust vjust to move label above the marker
+  geom_text(aes(y = Non_enrolled, label = paste0(round(Non_enrolled * 100), "%"), color = "Line 2"), 
+            vjust = -1, hjust = 0.5, show.legend = FALSE) +  # Adjust vjust to move label above the marker
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
+  scale_color_manual(values = c("Line 1" = "#fe6e87", "Line 2" = "#c5c6c7"), labels = c("Enrolled", "Non-enrolled")) +
+  labs(x = NULL, y = NULL, color = NULL) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank(), # Remove y-axis title
+        axis.ticks.y = element_blank(), # Remove y-axis ticks
+        axis.text.y = element_blank(),  # Remove y-axis labels
+        panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank())  # Remove minor gridlines
+
+print(p)
+```
 
 Monitors further asked parents questions about their knowledge of the deworming date, target age group, and what the treatment was for. The results are summarized in - **Figure 16**.
 
@@ -4503,7 +4534,198 @@ When comparing the surveyed coverage to the reported coverage, **we found that r
 
 ##### **Figure 21: Disaggregation by gender, enrollment status, and school type**
 
-/*figure 21*/
+```{r figure21, echo=FALSE}
+
+library(ggplot2)
+library(gridExtra)
+library(stringr)
+library(patchwork)
+library(tidyr)
+
+# sql query to get data 
+sql_query <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Male'"
+
+data <- dbGetQuery(con, sql_query)
+
+# sql query to get data 
+sql_query2 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Male'"
+
+data2 <- dbGetQuery(con, sql_query2)
+
+# sql query to get data 
+sql_query3 <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Female'"
+
+data3 <- dbGetQuery(con, sql_query3)
+
+# sql query to get data 
+sql_query4 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Female'"
+
+data4 <- dbGetQuery(con, sql_query4)
+
+# sql query to get data 
+sql_query5 <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Enrolled'"
+
+data5 <- dbGetQuery(con, sql_query5)
+
+# sql query to get data 
+sql_query6 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Enrolled'"
+
+data6 <- dbGetQuery(con, sql_query6)
+
+# sql query to get data 
+sql_query7 <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Nonenrolled'"
+
+data7 <- dbGetQuery(con, sql_query7)
+
+# sql query to get data 
+sql_query8 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Nonenrolled'"
+
+data8 <- dbGetQuery(con, sql_query8)
+
+# sql query to get data 
+sql_query9 <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Public'"
+
+data9 <- dbGetQuery(con, sql_query9)
+
+# sql query to get data 
+sql_query10 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Public'"
+
+data10 <- dbGetQuery(con, sql_query10)
+
+# sql query to get data 
+sql_query11 <- "SELECT mean
+              FROM program_reach
+              WHERE LGA = 'Overall_Private'"
+
+data11 <- dbGetQuery(con, sql_query11)
+
+# sql query to get data 
+sql_query12 <- "SELECT mean
+              FROM survey_coverage
+              WHERE LGA = 'Overall_Private'"
+
+data12 <- dbGetQuery(con, sql_query12)
+
+# Merge the data
+merged_data <- merge(data, data2, by = NULL)
+
+merged_data2 <- merge(data3, data4, by = NULL)
+
+merged_data3 <- merge(data5, data6, by = NULL)
+
+merged_data4 <- merge(data7, data8, by = NULL)
+
+merged_data5 <- merge(data9, data10, by = NULL)
+
+merged_data6 <- merge(data11, data12, by = NULL)
+
+# Reshape data
+merged_data_long <- pivot_longer(merged_data, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot1
+p1 <- ggplot(merged_data_long, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Male\n(n = 1,222)", y = NULL, fill = NULL) +  
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "none")  +
+  coord_cartesian(ylim = c(0, 1))
+
+# Reshape data
+merged_data_long2 <- pivot_longer(merged_data2, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot2
+p2 <- ggplot(merged_data_long2, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) + 
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Female\n(n = 1,150)", y = NULL, fill = NULL) +
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "none")  +
+  coord_cartesian(ylim = c(0, 1))
+
+# Reshape data
+merged_data_long3 <- pivot_longer(merged_data3, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot3
+p3 <- ggplot(merged_data_long3, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Enrolled\n(n = 2,288)", y = NULL, fill = NULL) +  
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "none") +
+  coord_cartesian(ylim = c(0, 1))
+
+# Reshape data
+merged_data_long4 <- pivot_longer(merged_data4, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot4
+p4 <- ggplot(merged_data_long4, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Non-enrolled\n(n = 84)", y = NULL, fill = NULL) +  
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "none") +
+          coord_cartesian(ylim = c(0, 1))
+
+# Reshape data
+merged_data_long5 <- pivot_longer(merged_data5, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot5
+p5 <- ggplot(merged_data_long5, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Public\n(n=1,908)", y = NULL, fill = NULL) +  
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "none") +
+          coord_cartesian(ylim = c(0, 1))
+
+# Reshape data
+merged_data_long6 <- pivot_longer(merged_data6, cols = c(mean.x, mean.y), names_to = "category", values_to = "mean_value")
+
+# plot6
+p6 <- ggplot(merged_data_long6, aes(x = category, y = mean_value, fill = category)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", width = 1) +  
+     geom_text(aes(label = paste0(round(mean_value*100), "%")), position = position_dodge(width = 0.8), vjust = -0.5, size = 3) +  
+     scale_fill_manual(values = c("#fe6e87", "#c5c6c7", "#595959")) +
+     labs(x = "Private\n(n=380)", y = NULL, fill = NULL) +  
+     theme_minimal() +  
+     theme(axis.text.x = element_blank(), axis.text.y = element_blank(),  
+           legend.position = "right") +
+          coord_cartesian(ylim = c(0, 1))
+
+
+print(p1|p2|p3|p4|p5|p6)
+```
 
 A disaggregation by gender revealed a comparable (not more than one percentage point difference) program reach and surveyed coverage for one arm compared to the other, indicating that the program did not reach more of one gender. By enrollment status and school type, a much higher program reach and surveyed coverage was noted for the enrolled children and public schools. 
 
