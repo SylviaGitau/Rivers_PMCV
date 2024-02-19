@@ -11,7 +11,6 @@ runtime: shiny
 ---
 
 
-
 *A Process Monitoring and Coverage Validation report from year 6 of School-<br>Based Deworming implementation in Rivers State, Nigeria*
 
 <span style="background-color:#fe6e87; color:white; display: inline-block; text-align: center; width: 100%;">*May and November, 2022*</span>
@@ -521,25 +520,113 @@ Table 1 below provides the round-wise breakdown of Process Monitoring and Covera
     </tr>
     <tr>
       <td>Emohua</td>
-      <td>84%</td>
-      <td>82%</td>
+      ```{r program_reach, results='asis'}
+      query_program_reach <- "SELECT mean,lower_bound,upper_bound
+                              FROM program_reach
+                              WHERE LGA = 'Emohua'"
+                          
+      program_reach_data <- dbGetQuery(con, query_program_reach)
+      
+for (col_name in names(program_reach_data)) {
+    cat("<td>")
+    if (any(is.na(program_reach_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(program_reach_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
+      ```{r survey_coverage, results='asis'}
+      query_survey_coverage <- "SELECT mean,lower_bound,upper_bound
+                              FROM survey_coverage
+                              WHERE LGA = 'Emohua'"
+                          
+      survey_coverage_data <- dbGetQuery(con, query_survey_coverage)
+      
+for (col_name in names(survey_coverage_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(survey_coverage_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
       <td>86%</td>
-      <td>83%</td>
-      <td>78%</td>
-      <td>87%</td>
-      <td>86%</td>
-      <td>1,671</td>
+      ```{r survey_coverage_N, results='asis'}
+      query_survey_coverage_N <- "SELECT alb_n
+                              FROM survey_coverage
+                              WHERE LGA = 'Emohua'"
+                          
+      survey_coverage_N_data <- dbGetQuery(con, query_survey_coverage_N)
+      
+for (col_name in names(survey_coverage_N_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_N_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat((survey_coverage_N_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
     </tr>
     <tr>
       <td>Opobo / Nkoro</td>
-      <td>92%</td>
-      <td>90%</td>
-      <td>94%</td>
-      <td>91%</td>
-      <td>88%</td>
-      <td>94%</td>
+      ```{r program_reach_o, results='asis'}
+      query_program_reach_o <- "SELECT mean,lower_bound,upper_bound
+                              FROM program_reach
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      program_reach_o_data <- dbGetQuery(con, query_program_reach_o)
+      
+for (col_name in names(program_reach_o_data)) {
+    cat("<td>")
+    if (any(is.na(program_reach_o_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(program_reach_o_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
+      ```{r survey_coverage_o, results='asis'}
+      query_survey_coverage_o <- "SELECT mean,lower_bound,upper_bound
+                              FROM survey_coverage
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      survey_coverage_o_data <- dbGetQuery(con, query_survey_coverage_o)
+      
+for (col_name in names(survey_coverage_o_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_o_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(survey_coverage_o_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
       <td>86%</td>
-      <td>701</td>
+      ```{r survey_coverage_o_N, results='asis'}
+      query_survey_coverage_o_N <- "SELECT alb_n
+                              FROM survey_coverage
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      survey_coverage_o_N_data <- dbGetQuery(con, query_survey_coverage_o_N)
+      
+for (col_name in names(survey_coverage_o_N_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_o_N_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat((survey_coverage_o_N_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
     </tr>
   </table>
 </div>
@@ -604,9 +691,9 @@ A few weeks after the round one MDA, monitors conducted coverage validation to d
     </tr>
   </thead>
   <tbody>
-  <tr>
+    <tr>
       <td colspan="4" class="left-align"><strong>**LGA and teacher training**</strong></td>
-      </tr>
+    </tr>
   <tr>
   <td>LGA training sessions</td>
   <td>14</td>
@@ -1384,7 +1471,7 @@ plot <- ggplot(data, aes(x = reorder(attibutes,value), y = value, fill = attibut
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Responsibilities of head teachers covered during LGA\ntraining (n=14)", x = NULL, y = NULL) +
+     labs(title = "Responsibilities of head teachers\ncovered during LGA\ntraining (n=14)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
@@ -1395,7 +1482,7 @@ plot2 <- ggplot(data2, aes(x = reorder(variable_mapped,value), y = value, fill =
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = variable_mapped), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Responsibilities of teachers covered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
+     labs(title = "Responsibilities of teachers\ncovered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
@@ -1406,7 +1493,7 @@ plot3 <- ggplot(data3, aes(x = reorder(attibutes,value), y = value, fill = attib
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Responsibilities of FLHF staff covered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
+     labs(title = "Responsibilities of FLHF staff\ncovered during teacher\ntraining (n=47)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
@@ -2280,7 +2367,7 @@ plot <- ggplot(data, aes(x = attibutes, y = value, fill = attibutes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attibutes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "Messages covered\nunder side effects\n(n=47)", x = NULL, y = NULL) +
+     labs(title = "Messages covered under side\neffects (n=47)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
@@ -2306,15 +2393,14 @@ plot3 <- ggplot(data3, aes(x = attributes, y = value, fill = attributes)) +
      geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
      geom_text(aes(label = scales::percent(value), y = value, group = attributes), 
                position = position_stack(vjust = 0.5), size = 3) +
-     labs(title = "FLHF knowledge of side effects on deworming day (n=14)", x = NULL, y = NULL) +
+     labs(title = "FLHF knowledge of side effects on\ndeworming day (n=14)", x = NULL, y = NULL) +
      coord_flip() +
      theme_minimal() +
      theme(axis.text.x = element_blank()) +  
     scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) 
 
-# Arrange the plot with adjusted layout
- plot + plot2 + plot3 + 
-  plot_layout(widths = 1)
+# Arrange the plot 
+print(plot2+plot/plot3)
 ```
 
 ##### **Table 5: Coverage and retention of knowledge of side effects in LGA and teacher trainings and on deworming day**
@@ -4275,7 +4361,7 @@ Coverage validation surveys were administered within six weeks of the MDA in two
 }
 </style>
 
-<!-- Table -->
+<!-- Your Table -->
 <div class="custom-table">
   <table>
     <tr>
@@ -4298,25 +4384,113 @@ Coverage validation surveys were administered within six weeks of the MDA in two
     </tr>
     <tr>
       <td>Emohua</td>
-      <td>84%</td>
-      <td>82%</td>
+      ```{r program_reach2, results='asis'}
+      query_program_reach <- "SELECT mean,lower_bound,upper_bound
+                              FROM program_reach
+                              WHERE LGA = 'Emohua'"
+                          
+      program_reach_data <- dbGetQuery(con, query_program_reach)
+      
+for (col_name in names(program_reach_data)) {
+    cat("<td>")
+    if (any(is.na(program_reach_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(program_reach_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
+      ```{r survey_coverage2, results='asis'}
+      query_survey_coverage <- "SELECT mean,lower_bound,upper_bound
+                              FROM survey_coverage
+                              WHERE LGA = 'Emohua'"
+                          
+      survey_coverage_data <- dbGetQuery(con, query_survey_coverage)
+      
+for (col_name in names(survey_coverage_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(survey_coverage_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
       <td>86%</td>
-      <td>83%</td>
-      <td>78%</td>
-      <td>87%</td>
-      <td>86%</td>
-      <td>1,671</td>
+      ```{r survey_coverage_N2, results='asis'}
+      query_survey_coverage_N <- "SELECT alb_n
+                              FROM survey_coverage
+                              WHERE LGA = 'Emohua'"
+                          
+      survey_coverage_N_data <- dbGetQuery(con, query_survey_coverage_N)
+      
+for (col_name in names(survey_coverage_N_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_N_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat((survey_coverage_N_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
     </tr>
     <tr>
       <td>Opobo / Nkoro</td>
-      <td>92%</td>
-      <td>90%</td>
-      <td>94%</td>
-      <td>91%</td>
-      <td>88%</td>
-      <td>94%</td>
+      ```{r program_reach_o2, results='asis'}
+      query_program_reach_o <- "SELECT mean,lower_bound,upper_bound
+                              FROM program_reach
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      program_reach_o_data <- dbGetQuery(con, query_program_reach_o)
+      
+for (col_name in names(program_reach_o_data)) {
+    cat("<td>")
+    if (any(is.na(program_reach_o_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(program_reach_o_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
+      ```{r survey_coverage_o2, results='asis'}
+      query_survey_coverage_o <- "SELECT mean,lower_bound,upper_bound
+                              FROM survey_coverage
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      survey_coverage_o_data <- dbGetQuery(con, query_survey_coverage_o)
+      
+for (col_name in names(survey_coverage_o_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_o_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat(scales::percent(survey_coverage_o_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
       <td>86%</td>
-      <td>701</td>
+      ```{r survey_coverage_o_N2, results='asis'}
+      query_survey_coverage_o_N <- "SELECT alb_n
+                              FROM survey_coverage
+                              WHERE LGA = 'Opobo/Nkoro'"
+                          
+      survey_coverage_o_N_data <- dbGetQuery(con, query_survey_coverage_o_N)
+      
+for (col_name in names(survey_coverage_o_N_data)) {
+    cat("<td>")
+    if (any(is.na(survey_coverage_o_N_data[[col_name]]))) {
+      cat("N/A ")
+    } else {
+      cat((survey_coverage_o_N_data[[col_name]]), " ")
+    }
+    cat("</td>")
+  }
+```
     </tr>
   </table>
 </div>
