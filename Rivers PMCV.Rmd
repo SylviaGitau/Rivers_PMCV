@@ -38,6 +38,7 @@ library(dplyr)
 library(kableExtra)
 library(RPostgreSQL)
 library(DBI)
+library(tinytex)
 ```
 
 
@@ -173,6 +174,7 @@ AND state = 'Rivers'
 AND round = 'Overall'
 AND (
     variable = 'Proportion of parents who were aware of deworming activity at school'
+    AND attributes IS NULL
     OR (
         variable = 'Is child enrolled in school?'
         OR (
@@ -189,7 +191,7 @@ AND (
 data <- dbGetQuery(con, sql_query)
 
 # Calculate the percentage and display the text
-value_percent <- data$value[data$variable == 'Proportion of parents who were aware of deworming activity at school'] * 100
+value_percent <- data$value[data$variable == 'Proportion of parents who were aware of deworming activity at school' & is.na(data$attributes)] * 100
 value_percent2 <- data$value[data$variable == 'Is child enrolled in school?'] * 100
 value_percent3 <- data$value[data$variable == 'Why will/did your children NOT get deworming medicine today?' & data$attributes == 'Not aware of the deworming'] * 100
 value_percent4 <- data$value[data$variable == 'Why will/did your children NOT get deworming medicine today?' & data$attributes == 'Child is not enrolled'] * 100
@@ -4735,7 +4737,35 @@ Compliance rates (those who reported receiving the drug and swallowing it) were 
 
 ##### **Figure 22: Reasons the drug was not given (n=322)**
 
-/*figure*/
+```{r figure22, echo=FALSE}
+
+names <- c("School did not receive drugs","Already took at home","Lack of parent consent","Child refused","Child was ill","Child was taking other medications","Child was away from school","Don't know")
+values <- c(0.14,0.07,0.01,0.01,0.04,0.03,0.54,0.16)
+X <- data.frame(names,values)
+
+library(ggplot2)
+
+plot <- ggplot(X, aes(x = reorder(names, values), y = values)) +
+     geom_bar(stat = "identity", position = "identity", color = "white", fill = "#fe6e87") +
+     geom_text(aes(label = scales::percent(values), y = values, group = names), 
+               position = position_stack(vjust = 0.5), size = 3) +
+     labs(title = NULL, x = NULL, y = NULL) +
+     coord_flip() +
+     scale_y_continuous(limits = c(0, 0.6), 
+                        breaks = seq(0, 0.6, by = 0.1),
+                        labels = NULL) + 
+     theme(axis.line.y = element_blank(), 
+           axis.text.x = element_blank(),
+           axis.text.y = element_blank(),      
+           axis.title.y = element_blank(),    
+           axis.ticks.y = element_blank(),     
+           panel.grid.major = element_blank(), 
+           panel.grid.minor = element_blank()) +
+     theme_minimal()
+
+print(plot)
+```
+
 
 ## <span style="color:#fe6e87;">5.3 Unprogrammed Deworming</span>
 
